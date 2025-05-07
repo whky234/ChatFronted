@@ -1,0 +1,71 @@
+<div class="container settings-container p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="settings-title">Settings</h3>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+  </div>
+
+  <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab">
+        Account Settings
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="privacy-tab" data-bs-toggle="tab" data-bs-target="#privacy" type="button" role="tab">
+        Privacy Controls
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3" id="settingsTabsContent">
+    <!-- Account Settings -->
+    <div class="tab-pane fade show active" id="account" role="tabpanel">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          placeholder="Enter your email"
+          [(ngModel)]="settings.email"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          placeholder="Enter a new password"
+          [(ngModel)]="settings.password"
+        />
+      </div>
+      <button class="btn btn-primary w-100" (click)="saveAccountSettings()">Save Changes</button>
+    </div>
+
+    <!-- Privacy Controls -->
+    <div class="tab-pane fade" id="privacy" role="tabpanel">
+
+    
+      <button class="btn btn-primary mb-3 w-100" (click)="toggleProfileVisibility()">
+        {{ privacy.hideProfileInfo ? 'Set Profile to Visible' : 'Set Profile to Hidden' }}
+      </button>
+
+
+
+      <h5>Blocked Users</h5>
+      <div *ngIf="blockedUsers.length === 0" class="text-muted">
+        <p>No blocked users.</p>
+      </div>
+
+      <ul *ngIf="blockedUsers.length > 0" class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let user of blockedUsers">
+          <span class="fw-semibold">{{ user.name }}</span>
+          <button class="btn btn-outline-danger btn-sm" (click)="unblockUser(user._id)">
+            <i class="bi bi-unlock"></i> Unblock
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

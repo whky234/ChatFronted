@@ -1,0 +1,62 @@
+<div class="container">
+  <h2 mat-dialog-title>Create Group</h2>
+
+  <div mat-dialog-content>
+    <form>
+      <!-- Group Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Group Name</mat-label>
+        <input
+          matInput
+          placeholder="Enter group name"
+          [(ngModel)]="groupName"
+          name="groupName"
+          required
+        />
+      </mat-form-field>
+
+      <!-- Add Participants -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Add Participants</mat-label>
+        <mat-select multiple [(ngModel)]="participants" name="participants">
+          <mat-option *ngFor="let user of availableUsers" [value]="user.userId._id">
+            {{ user.name }} ({{ user.userId._id }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Group Description -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Group Description</mat-label>
+        <textarea
+          matInput
+          [(ngModel)]="groupDescription"
+          name="groupDescription"
+          rows="3"
+          placeholder="Enter a brief description of the group"
+        ></textarea>
+      </mat-form-field>
+
+      <!-- Group Image Upload -->
+      <div class="image-upload">
+        <label for="groupImage">Group Image:</label>
+        <input
+          type="file"
+          id="groupImage"
+          accept="image/*"
+          (change)="onImageSelected($event)"
+        />
+      </div>
+
+      <!-- Preview Image -->
+      <div class="image-preview" *ngIf="groupImage">
+        <img [src]="groupImage" alt="Group Image Preview" />
+      </div>
+    </form>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button color="primary" (click)="createGroup()">Create</button>
+  </div>
+</div>

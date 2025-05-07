@@ -1,0 +1,327 @@
+<div>
+  <button
+    class="btn btn-primary toggle-participants"
+    *ngIf="isMobileView"
+    (click)="toggleParticipants()"
+  >
+    {{ showParticipants ? 'Hide Participants' : 'Show Participants' }}
+  </button>
+
+  <div *ngIf="showParticipants">
+    <div class="participant-header d-flex justify-content-between align-items-center">
+      <!-- <h3>Participants</h3> -->
+      <div class="actions">
+        <button class="btn btn-outline-secondary me-2" (click)="onSearch()"
+        >🔍 Search</button>
+        <button
+          class="btn btn-outline-primary me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#Createmodel"
+        >
+          ➕ Create Group
+        </button>
+        <!-- Add User Button -->
+        <button
+          class="btn btn-success"
+          data-bs-toggle="modal"
+          data-bs-target="#addUserModal"
+        >
+          ➕ Add User
+        </button>
+      </div>
+    </div>
+
+    <input
+      *ngIf="isSearching"
+      class="form-control my-2"
+      type="text"
+      placeholder="Search participants..."
+      [(ngModel)]="searchQuery"
+      (input)="filterChatUsers()"
+    />
+
+    <div *ngIf="!showGroups">
+    <!-- Chat Users -->
+    <!-- <h4>Users</h4> -->
+     <div *ngIf="!searchQuery">
+    <div
+      class="participant-item d-flex align-items-center justify-content-between "
+      *ngFor="let user of chatUsers"
+      (click)="selectUser(user)"
+    >
+      <div class="d-flex align-items-center">
+        <img
+          [src]="user.profileImage || 'assets/images/placeholder-profile.png'"
+          alt="Profile Image"
+          class="rounded-circle me-2"
+          width="40"
+          height="40"
+        />
+        <span>{{ user.userId.name }}</span>
+
+
+
+      </div>
+      <i *ngIf="isUserOnline(user.userId._id)" class="fas fa-circle online"></i>
+<i *ngIf="!isUserOnline(user.userId._id)" class="fas fa-circle offline"></i>
+
+
+
+
+    </div>
+  </div>
+  <div *ngIf="searchQuery">
+    <div
+    class="participant-item d-flex align-items-center justify-content-between "
+    *ngFor="let user of filteredUsers"
+    (click)="selectUser(user)"
+  >
+    <div class="d-flex align-items-center">
+      <img
+        [src]="user.profileImage || 'assets/images/placeholder-profile.png'"
+        alt="Profile Image"
+        class="rounded-circle me-2"
+        width="40"
+        height="40"
+      />
+      <span>{{ user.userId.name }}</span>
+
+
+
+    </div>
+    <i *ngIf="isUserOnline(user.userId._id)" class="fas fa-circle online"></i>
+<i *ngIf="!isUserOnline(user.userId._id)" class="fas fa-circle offline"></i>
+
+
+
+
+  </div>
+</div>
+
+  </div>
+
+  <div *ngIf="showGroups">
+    <!-- <h4>Groups</h4> -->
+    <div *ngIf="groups.length > 0; else noGroups">
+      <div *ngIf="!searchQuery">
+      <div
+        class="participant-items"
+        *ngFor="let group of groups"
+        (click)="selectGroup(group)"
+      >
+        <!-- Group Image -->
+        <img *ngIf="group.image" [src]="group.image" alt="{{ group.name }}" class="group-image" />
+
+        <!-- Group Name -->
+        <span>{{ group.name }}</span>
+
+         <!-- Three-dot menu -->
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <!-- Menu Options -->
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="leaveGroup(group._id)">
+          <mat-icon>exit_to_app</mat-icon> Leave Group
+        </button>
+
+        <button mat-menu-item (click)="openAddMembersDialog()">
+          <mat-icon>person_add</mat-icon>
+          <span>Add Members</span>
+        </button>
+      </mat-menu>
+      </div>
+    </div>
+
+    <div *ngIf="searchQuery">
+      <div
+        class="participant-items"
+        *ngFor="let group of filteredGroups"
+        (click)="selectGroup(group)"
+      >
+        <!-- Group Image -->
+        <img *ngIf="group.image" [src]="group.image" alt="{{ group.name }}" class="group-image" />
+
+        <!-- Group Name -->
+        <span>{{ group.name }}</span>
+
+         <!-- Three-dot menu -->
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <!-- Menu Options -->
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="leaveGroup(group._id)">
+          <mat-icon>exit_to_app</mat-icon> Leave Group
+        </button>
+
+        <button mat-menu-item (click)="openAddMembersDialog()">
+          <mat-icon>person_add</mat-icon>
+          <span>Add Members</span>
+        </button>
+      </mat-menu>
+      </div>
+    </div>
+    </div>
+    <ng-template #noGroups>
+      <p>No groups available.</p>
+    </ng-template>
+  </div>
+
+
+</div>
+
+<!-- Add User Modal -->
+<div
+  class="modal fade"
+  id="addUserModal"
+  tabindex="-1"
+  aria-labelledby="addUserModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <div class="mb-3">
+            <label for="newUserEmail" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="newUserEmail"
+              [(ngModel)]="newEmail"
+              name="newEmail"
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="addUserToChat()"
+        >
+          Add User
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add User Modal -->
+<div
+  class="modal fade"
+  id="Createmodel"
+  tabindex="-1"
+  aria-labelledby="addUserModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Add New Group</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div mat-dialog-content>
+          <form>
+            <!-- Group Name -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Group Name</mat-label>
+              <input
+                matInput
+                placeholder="Enter group name"
+                [(ngModel)]="groupName"
+                name="groupName"
+                required
+              />
+            </mat-form-field>
+
+            <!-- Add Participants -->
+            <mat-form-field appearance="outline" class="full-width" *ngIf="availableUsers.length > 0">
+              <mat-label>Add Participants</mat-label>
+              <mat-select multiple [(ngModel)]="participants" name="participants">
+                <ng-container *ngFor="let user of availableUsers">
+                  <mat-option *ngIf="user?.userId?._id !== currentuser" [value]="user?.userId?._id">
+                    {{ user.userId.name }} ({{ user.userId._id }})
+                  </mat-option>
+                </ng-container>
+              </mat-select>
+            </mat-form-field>
+
+
+
+            <!-- Group Description -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Group Description</mat-label>
+              <textarea
+                matInput
+                [(ngModel)]="groupDescription"
+                name="groupDescription"
+                rows="3"
+                placeholder="Enter a brief description of the group"
+              ></textarea>
+            </mat-form-field>
+
+            <!-- Group Image Upload -->
+            <div class="image-upload">
+              <label for="groupImage">Group Image:</label>
+              <input
+                type="file"
+                id="groupImage"
+                accept="image/*"
+                (change)="onImageSelected($event)"
+              />
+            </div>
+
+            <!-- Preview Image -->
+            <div class="image-preview" *ngIf="groupImage">
+              <img [src]="groupImage" alt="Group Image Preview" />
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="createGroup()"
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

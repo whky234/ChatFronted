@@ -1,0 +1,133 @@
+/* Container for the entire video chat UI */
+.video-chat-container {
+  background-color: #f7f7f7;
+  min-height: 100vh;
+  padding: 20px;
+  overflow: auto;
+  position: relative;
+}
+
+/* Minimized floating style */
+.video-chat-container.minimized {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  width: 300px;
+  height: auto;
+  z-index: 1050;
+  background: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 5px;
+}
+
+/* Video inside minimized view */
+.video-chat-container.minimized video {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Hide non-essential UI in minimized mode */
+.video-chat-container.minimized .controls,
+.video-chat-container.minimized .label,
+.video-chat-container.minimized .leave-btn,
+.video-chat-container.minimized p,
+.video-chat-container.minimized .join-card,
+.video-chat-container.minimized .join-input {
+  display: none !important;
+}
+
+/* Toggle button for minimizing/restoring */
+.minimize-toggle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 20;
+}
+
+/* Card for creating/joining rooms */
+.join-card {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Input group for joining a room */
+.join-input {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+}
+
+/* Video container background and layout */
+.video-container {
+  text-align: center;
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #e8f0fe, #ffffff);
+  overflow: auto;
+}
+
+/* Each video block */
+.video-box {
+  background: #333;
+  padding: 15px;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Actual video element */
+.video-frame {
+  width: 100%;
+  border-radius: 10px;
+  background: black;
+}
+
+/* Mute/video controls */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+/* "You" / "Remote" labels */
+.label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Leave Room button */
+.leave-btn {
+  width: 50%;
+  max-width: 300px;
+  margin-top: 15px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .video-container {
+    overflow: auto;
+  }
+
+  .join-card, .join-input {
+    max-width: 100%;
+  }
+
+  .video-chat-container.minimized {
+    width: 90%;
+    right: 5%;
+  }
+}

@@ -1,0 +1,383 @@
+/* General Styles for Participant List */
+.participant-list {
+  width: 100%;
+  max-width: 400px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  max-height: 100vh;
+  overflow-y: visible;
+  transition: all 0.3s ease;
+}
+
+/* Container for overall spacing */
+.container {
+  margin-top: 20px;
+}
+
+/* Header Styles */
+.participant-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #20b17c 100%);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px 8px 0 0;
+}
+
+.participant-header h3 {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  /* gap: 8px; */
+  margin-top: 8px;
+}
+
+.action-btn {
+  background-color: #20b17c;
+  border: none;
+  color: white;
+  font-size: 0.9rem; /* Reduced font size */
+  cursor: pointer;
+  padding: 4px 10px; /* Smaller padding */
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: #00695c;
+}
+
+/* Search Input Styles */
+.search-input {
+  width: 90%;
+  margin: 8px auto;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  display: block;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Participant Items */
+.participant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
+  overflow: auto;
+}
+
+.participant-item:last-child {
+  border-bottom: none;
+}
+
+.participant-item:hover {
+  background-color: #f1f1f1;
+}
+
+.participant-item img {
+  width: 35px; /* Smaller image size */
+  height: 35px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+}
+
+.participant-item span {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.participant-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-icon {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-icon.online {
+  color: green;
+}
+
+.status-icon.offline {
+  color: red;
+}
+
+/* Modal Styling */
+.modal-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  background-color: #20b17c;
+  color: white;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal-footer {
+  justify-content: space-between;
+}
+
+.btn-close {
+  background-color: white;
+  color: #20b17c;
+}
+
+/* Buttons inside the modal */
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.modal-footer .btn-primary {
+  background: linear-gradient(135deg, #e3f2fd 0%, #14f1a0 100%);
+  color: white;
+  border: none;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #20b17c;
+}
+
+/* Mobile View Toggle Button */
+.toggle-participants {
+  display: none;
+  background: linear-gradient(135deg, #e3f2fd 0%, #06faa1 100%);
+  color: white;
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  margin: 8px auto;
+  cursor: pointer;
+  width: 90%;
+}
+
+.toggle-participants:hover {
+  background-color: #45a049;
+}
+
+.group-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.participant-items {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.participant-items:hover {
+  background-color: #f5f5f5;
+}
+
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
+  .participant-list {
+    max-width: 100%;
+    border-radius: 0;
+    border: none;
+    max-height: 100vh;
+    overflow-y: visible;
+  }
+
+  .participant-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .actions {
+    justify-content: center;
+    margin-top: 5px;
+  }
+
+  .toggle-participants {
+    display: block;
+  }
+
+  .action-btn {
+    font-size: 0.8rem; /* Smaller font size for buttons */
+    padding: 3px 8px;
+  }
+
+  .participant-item {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .participant-item img {
+    flex-shrink: 0;
+  }
+
+  .participant-item span {
+    display: inline-block;
+    margin-left: 10px;
+  }
+
+  .participant-header {
+    flex-wrap: wrap;
+  }
+
+  .participant-header .actions {
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .participant-list {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+@media screen and (max-width: 480px ) {
+  .participant-list {
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  .participant-item img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .participant-item span {
+    font-size: 0.85rem;
+  }
+
+  .search-input {
+    font-size: 0.85rem;
+  }
+
+  .action-btn {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+
+  .group-item h5 {
+    font-size: 0.9rem;
+  }
+
+  .group-item p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Group Section Styling */
+.group-section {
+  margin-top: 15px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+i {
+  font-size: 12px; /* Adjust size */
+  margin-right: 5px;
+}
+
+.online {
+  color: green;
+}
+
+.offline {
+  color: red;
+}
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.group-section h4 {
+  font-size: 1.4rem;
+  color: #00796b;
+  margin-bottom: 8px;
+}
+
+.group-item {
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+  background-color: white;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.group-item:hover {
+  background-color: #f1f1f1;
+}
+
+.group-item h5 {
+  font-size: 1rem;
+  color: #333;
+}
+
+.group-item p {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.full-width {
+  width: 100%;
+}
+.container{
+  background-color: #f1f2f2f6;
+}
+
+mat-dialog-content {
+  min-width: 300px;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.image-upload {
+  margin: 10px 0;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+  margin-top: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+

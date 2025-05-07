@@ -1,0 +1,115 @@
+.profile-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  max-width: 800px; /* Set max width for larger screens */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+input[type="file"] {
+  margin-top: 5px;
+}
+
+.btn-primary {
+  grid-column: span 2; /* Button spans across both columns */
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .profile-container {
+    width: 80%;
+  }
+
+  form {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    width: 90%;
+    padding: 15px;
+  }
+
+  form {
+    grid-template-columns: 1fr; /* Switch to single column on medium screens */
+  }
+
+  .btn-primary {
+    grid-column: 1; /* Button adjusts to single-column layout */
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .form-control {
+    font-size: 14px;
+  }
+
+  .btn-primary {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+.icon
+{
+  color: black;
+  position: fixed;
+  top:0;
+  right: 0;
+}

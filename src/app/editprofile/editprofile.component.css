@@ -1,0 +1,54 @@
+.audio-call-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 70vh;
+  background-color: #f0f0f0;
+  padding: 20px;
+  position: fixed;
+  top: 10%;
+  left: 25%;
+  z-index: 1000;
+  width: 50%;
+}
+
+.call-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.call-status {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.participant-info {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.profile-pic {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.participant-name {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.call-controls {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  padding: 20px;
+}
+
+.mute-btn, .speaker-btn, .hold-btn, .end-call-btn {
+  background-color: #ff5e5e;
+  color: #fff;
+}

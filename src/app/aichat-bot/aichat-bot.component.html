@@ -1,0 +1,28 @@
+<div class="ai-chatbot">
+  <div class="ai-chatbot-header">
+    <h3>AI Chatbot</h3>
+    <button mat-icon-button (click)="closeChatBot()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="ai-chatbot-messages">
+    <div *ngFor="let message of messages" [class.user-message]="message.sender === 'user'" [class.bot-message]="message.sender === 'bot'">
+      <p *ngIf="message.sender === 'user'">{{ message.text }}</p>
+      <div *ngIf="message.sender === 'bot'" [innerHTML]="message.text"></div> <!-- Render HTML response -->
+    </div>
+    <div *ngIf="isLoading" class="message typing-indicator">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+  <div class="ai-chatbot-input">
+    <mat-form-field class="full-width">
+      <mat-label>Type your message</mat-label>
+      <input matInput [(ngModel)]="userMessage" (keyup.enter)="sendMessage()" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="sendMessage()">Send</button>
+  </div>
+</div>

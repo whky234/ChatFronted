@@ -1,0 +1,58 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center vh-100 text-primary">
+  <mat-spinner></mat-spinner>
+  <p class="mt-2 fw-bold">Loading profile...</p>
+</div>
+
+<button class="btn-close position-absolute top-0 end-0 m-3" (click)="CloseDialog()" aria-label="Close"></button>
+
+
+
+<!-- Profile View -->
+<div *ngIf="participantProfile && !errorMessage" class="container-fluid h-100">
+  <div class="row h-100">
+    <!-- Left Side Panel -->
+    <div class="col-md-4 text-white p-4 d-flex flex-column align-items-center justify-content-center"
+         style="background: linear-gradient(135deg, #e3f2fd 0%, #20b17c 100%);">
+      <img [src]="participantProfile.profileImage || 'assets/default-profile.png'"
+           alt="Profile Image"
+           class="rounded-circle border border-white mb-3"
+           style="width: 100px; height: 100px; object-fit: cover;">
+           <h5 class="mb-1 text-center fs-5">{{ participantProfile.userId?.name }}</h5>
+           <p class="mb-0 text-center small">{{ participantProfile.description || 'Web Designer' }}</p>
+    </div>
+
+    <!-- Right Side Panel -->
+    <div class="col-md-8 p-4 bg-light overflow-auto">
+      <h6 class="text-uppercase border-bottom pb-2 mb-4">Profile Information</h6>
+
+      <div class="mb-3">
+        <strong>Email:</strong> <div class="text-muted">{{ participantProfile.userId?.email }}</div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Bio:</strong> <div class="text-muted">{{ participantProfile.bio }}</div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Description:</strong> <div class="text-muted">{{ participantProfile.description }}</div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Contact Number:</strong> <div class="text-muted">{{ participantProfile.contactNumber }}</div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Created At:</strong> <div class="text-muted">{{ participantProfile.createdAt | date:'medium' }}</div>
+      </div>
+
+      <div class="mb-3">
+        <strong>Last Updated:</strong> <div class="text-muted">{{ participantProfile.updatedAt | date:'medium' }}</div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+</div>

@@ -1,0 +1,350 @@
+<!-- Top Heading -->
+
+<!-- Search Task Tab -->
+
+<div class="kanban-heading">
+  <h1>🧠 SwiftChatPro Task Board</h1>
+  <p class="subheading">Track your task progress across different stages</p>
+</div>
+
+<div class="search-wrapper">
+  <div style="position: relative;">
+    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      class="search-bar"
+      placeholder="Search tasks..."
+    />
+  </div>
+</div>
+
+
+
+<div class="kanban-board">
+  <!-- Pending Tasks Column -->
+  <div
+    class="column"
+    id="pendingTasks"
+    cdkDropList
+    [cdkDropListData]="pendingTasks"
+    [cdkDropListConnectedTo]="[
+      'inProgressTasks',
+      'inReviewTasks',
+      'completedTasks'
+    ]"
+    (cdkDropListDropped)="drop($event, 'pending')"
+  >
+    <h3>Pending</h3>
+    <div *ngIf="pendingTasks.length > 0; else noPendingTasks">
+      <div
+        *ngFor="let task of filteredPendingTasks"
+        class="task-card"
+        cdkDrag
+        [cdkDragDisabled]="!isAssignedToCurrentUser(task)"
+      >
+        <h4>{{ task.title }}</h4>
+        <p>{{ task.description }}</p>
+        <p>Assigned To: {{ getAssignedToNames(task) }}</p>
+        <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
+        <p>Due Date: {{ task.deadline | date }}</p>
+
+        <div *ngFor="let assignee of task?.assignedTo">
+          <p>
+            {{ assignee.userId.name || "Unassigned" }}'s Status:
+            {{ assignee.status }}
+          </p>
+          <select
+            [ngClass]="{ 'disabled-text': !isAssignedToCurrentUser(task) }"
+            #statusSelect
+            (change)="
+              updateStatus(task._id, assignee.userId._id, statusSelect.value)
+            "
+          >
+            <option value="pending" [selected]="assignee.status === 'pending'">
+              Pending
+            </option>
+            <option
+              value="in-progress"
+              [selected]="assignee.status === 'in-progress'"
+            >
+              In Progress
+            </option>
+            <option
+              value="in-review"
+              [selected]="assignee.status === 'in-review'"
+            >
+              In Review
+            </option>
+            <option
+              value="completed"
+              [selected]="assignee.status === 'completed'"
+            >
+              Completed
+            </option>
+          </select>
+        </div>
+        <button
+          *ngIf="task?.createdBy?._id === currentuser"
+          mat-icon-button
+          (click)="editTask(task)"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          *ngIf="task?.createdBy?._id === currentuser"
+          mat-icon-button
+          color="warn"
+          (click)="deleteTask(task._id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <ng-template #noPendingTasks>
+      <p>No pending tasks available.</p>
+    </ng-template>
+  </div>
+
+  <!-- In Progress Tasks Column -->
+  <div
+    class="column"
+    id="inProgressTasks"
+    cdkDropList
+    [cdkDropListConnectedTo]="[
+      'inProgressTasks',
+      'inReviewTasks',
+      'completedTasks'
+    ]"
+    [cdkDropListData]="inProgressTasks"
+    (cdkDropListDropped)="drop($event, 'in-progress')"
+  >
+    <h3>In Progress</h3>
+    <div *ngIf="inProgressTasks.length > 0; else noInProgressTasks">
+      <div
+        *ngFor="let task of filteredInProgressTasks"
+        class="task-card"
+        cdkDrag
+        [cdkDragDisabled]="!isAssignedToCurrentUser(task)"
+      >
+        <h4>{{ task.title }}</h4>
+        <p>{{ task.description }}</p>
+        <p>Assigned To: {{ getAssignedToNames(task) }}</p>
+        <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
+        <p>Due Date: {{ task.deadline | date }}</p>
+        <div *ngFor="let assignee of task?.assignedTo">
+          <p>
+            {{ assignee.userId.name || "Unassigned" }}'s Status:
+            {{ assignee.status }}
+          </p>
+          <select
+            [ngClass]="{ 'disabled-text': !isAssignedToCurrentUser(task) }"
+            #statusSelect
+            (change)="
+              updateStatus(task._id, assignee.userId._id, statusSelect.value)
+            "
+          >
+            <option value="pending" [selected]="assignee.status === 'pending'">
+              Pending
+            </option>
+            <option
+              value="in-progress"
+              [selected]="assignee.status === 'in-progress'"
+            >
+              In Progress
+            </option>
+            <option
+              value="in-review"
+              [selected]="assignee.status === 'in-review'"
+            >
+              In Review
+            </option>
+            <option
+              value="completed"
+              [selected]="assignee.status === 'completed'"
+            >
+              Completed
+            </option>
+          </select>
+        </div>
+        <button
+          *ngIf="task?.createdBy?._id === currentuser"
+          mat-icon-button
+          color="warn"
+          (click)="deleteTask(task._id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <ng-template #noInProgressTasks>
+      <p>No in-progress tasks available.</p>
+    </ng-template>
+  </div>
+
+  <!-- In Review Tasks Column -->
+  <div
+    class="column"
+    id="inReviewTasks"
+    cdkDropList
+    [cdkDropListConnectedTo]="[
+      'inProgressTasks',
+      'inReviewTasks',
+      'completedTasks'
+    ]"
+    [cdkDropListData]="inReviewTasks"
+
+    (cdkDropListDropped)="drop($event, 'in-review')"
+
+  >
+    <h3>In Review</h3>
+    <div *ngIf="inReviewTasks.length > 0; else noInReviewTasks">
+      <div *ngFor="let task of filteredInReviewTasks" class="task-card" cdkDrag   [cdkDragDisabled]="task?.createdBy?._id !== currentuser"
+      >
+        <h4>{{ task.title }}</h4>
+        <p>{{ task.description }}</p>
+
+        <p>Assigned To: {{ getAssignedToNames(task) }}</p>
+        <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
+        <p>Due Date: {{ task.deadline | date }}</p>
+        <div *ngFor="let assignee of task?.assignedTo">
+          <p>
+            {{ assignee.userId.name || "Unassigned" }}'s Status:
+            {{ assignee.status }}
+          </p>
+          <select
+            #statusSelect
+            (change)="
+              updateStatus(task._id, assignee.userId._id, statusSelect.value)
+            "
+          >
+            <option value="pending" [selected]="assignee.status === 'pending'">
+              Pending
+            </option>
+            <option
+              value="in-progress"
+              [selected]="assignee.status === 'in-progress'"
+            >
+              In Progress
+            </option>
+            <option
+              value="in-review"
+              [selected]="assignee.status === 'in-review'"
+            >
+              In Review
+            </option>
+            <option
+              value="completed"
+              [selected]="assignee.status === 'completed'"
+            >
+              Completed
+            </option>
+          </select>
+
+          <!-- File Upload (Visible only to the assignee when in review) -->
+          <div
+            *ngIf="
+              assignee.userId?._id === currentuser &&
+              assignee.status === 'in-review'
+            "
+          >
+            <input
+              type="file"
+              (change)="uploadFile($event, task._id)"
+              accept=".pdf,.docx,.txt,.png,.jpg"
+            />
+          </div>
+
+          <!-- File Download (Visible only to the creator when task is in review) -->
+          <div *ngIf="task.createdBy._id===currentuser">
+            <div *ngFor="let assignee of task?.assignedTo">
+              <p>{{ assignee.userId.name }}'s Uploaded File:</p>
+
+              <!-- Show download button only if a file exists -->
+              <a
+                *ngIf="assignee.fileUrl"
+                [href]="assignee.fileUrl"
+                download
+                class="download-btn"
+              >
+                <mat-icon>cloud_download</mat-icon> Download File
+              </a>
+
+              <!-- Show message if no file uploaded -->
+              <p *ngIf="!assignee.fileUrl" class="no-file">
+                No file uploaded by {{ assignee.userId.name }}
+              </p>
+            </div>
+          </div>
+
+          <p>Task Status: {{ task.status }}</p>
+        </div>
+        <button
+          *ngIf="task?.createdBy?._id === currentuser"
+          mat-icon-button
+          color="warn"
+          (click)="deleteTask(task._id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <ng-template #noInReviewTasks>
+      <p>No tasks in review.</p>
+    </ng-template>
+  </div>
+
+  <!-- Completed Tasks Column -->
+  <div
+  class="column"
+  id="completedTasks"
+  cdkDropList
+  [cdkDropListConnectedTo]="['pendingTasks', 'inProgressTasks', 'inReviewTasks']"
+  [cdkDropListData]="completedTasks"
+  (cdkDropListDropped)="drop($event, 'completed')"
+>
+  <h3>Completed</h3>
+  <div *ngIf="completedTasks.length > 0; else noCompletedTasks">
+    <div
+      *ngFor="let task of filteredCompletedTasks"
+      class="task-card"
+      cdkDrag
+      [cdkDragDisabled]="!isAssignedToCurrentUser(task)"
+    >
+      <h4>{{ task.title }}</h4>
+      <p>{{ task.description }}</p>
+      <p>Assigned To: {{ getAssignedToNames(task) }}</p>
+      <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
+      <p>Due Date: {{ task.deadline | date }}</p>
+      <div *ngFor="let assignee of task?.assignedTo">
+        <p>
+          {{ assignee.userId.name || "Unassigned" }}'s Status:
+          {{ assignee.status }}
+        </p>
+        <p *ngIf="assignee.fileUrl">
+          Uploaded File:
+          <a [href]="assignee.fileUrl" download>
+            <mat-icon>cloud_download</mat-icon> Download
+          </a>
+        </p>
+      </div>
+      <button
+        *ngIf="task?.createdBy?._id === currentuser"
+        mat-icon-button
+        color="warn"
+        (click)="deleteTask(task._id)"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  <ng-template #noCompletedTasks>
+    <p>No completed tasks available.</p>
+  </ng-template>
+</div>
+
+</div>
+

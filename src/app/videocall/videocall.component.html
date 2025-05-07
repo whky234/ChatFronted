@@ -1,0 +1,54 @@
+<div class="container video-chat-container"  *ngIf="isVisible">
+
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isInRoom" class="d-flex flex-column align-items-center">
+    <div class="card p-4 shadow-sm text-center join-card">
+      <button class="btn btn-primary w-50 mx-auto d-block" (click)="createRoom()" [disabled]="isCreatingRoom">
+        {{ isCreatingRoom ? 'Creating Room...' : 'Create Room' }}
+      </button>
+      <div *ngIf="roomId" class="mt-3">
+        <p>Room ID: <strong>{{ roomId }}</strong></p>
+        <p class="text-muted">Share this ID to start the video chat</p>
+      </div>
+    </div>
+
+    <div class="mt-3 text-center">
+      <h5>OR</h5>
+      <div class="input-group join-input">
+        <input type="text" class="form-control" [(ngModel)]="joiningRoomId" placeholder="Enter Room ID">
+        <button class="btn btn-success" (click)="joinRoom()" [disabled]="isJoiningRoom || !joiningRoomId">
+          {{ isJoiningRoom ? 'Joining...' : 'Join Room' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isInRoom" class="video-container">
+    <div class="row g-3 justify-content-center">
+      <div class="col-12 col-md-5 video-box">
+        <video #localVideo autoplay muted playsinline class="video-frame"></video>
+        <div class="controls">
+          <button class="btn btn-outline-secondary" (click)="toggleMute()" [class.active]="isMuted">
+            {{ isMuted ? 'Unmute' : 'Mute' }}
+          </button>
+          <button class="btn btn-outline-secondary" (click)="toggleVideo()" [class.active]="isVideoOff">
+            {{ isVideoOff ? 'Show Video' : 'Hide Video' }}
+          </button>
+        </div>
+        <div class="label">You</div>
+      </div>
+
+      <div class="col-12 col-md-5 video-box">
+        <video #remoteVideo autoplay playsinline class="video-frame"></video>
+        <audio #remoteAudio autoplay controls class="d-none"></audio>
+        <div class="label">Remote</div>
+      </div>
+    </div>
+
+    <button class="btn btn-danger mt-3 leave-btn" (click)="leaveRoom()">Leave Room</button>
+    <p class="mt-2">Room ID: <strong>{{ roomId }}</strong></p>
+  </div>
+</div>

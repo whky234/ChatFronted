@@ -1,0 +1,29 @@
+<div class="audio-call-container">
+  <!-- Call Header -->
+  <div class="call-header">
+    <span class="call-status">Audio Call</span>
+    <button mat-icon-button class="end-call-btn" aria-label="End Call">
+      <mat-icon  routerLink="/chat">call_end</mat-icon>
+    </button>
+  </div>
+
+  <!-- Participant Profile and Name -->
+  <div class="participant-info">
+    <img src="path/to/profile.jpg" alt="Profile Picture" class="profile-pic">
+    <h2 class="participant-name">Participant Name</h2>
+    <span class="call-status">Calling...</span>
+  </div>
+
+  <!-- Call Controls -->
+  <div class="call-controls">
+    <button mat-icon-button class="mute-btn" aria-label="Mute">
+      <mat-icon>mic_off</mat-icon>
+    </button>
+    <button mat-icon-button class="speaker-btn" aria-label="Speaker">
+      <mat-icon>volume_up</mat-icon>
+    </button>
+    <button mat-icon-button class="hold-btn" aria-label="Hold">
+      <mat-icon>pause</mat-icon>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="container-fluid h-100">
+  <div *ngIf="profile && !ison" class="card shadow-lg profile-container">
+    <div class="row h-100">
+
+      <!-- Left Panel: Image + Name -->
+      <div class="col-md-4 text-white p-4 d-flex flex-column align-items-center justify-content-center"
+           style="background: linear-gradient(135deg, #e3f2fd 0%, #20b17c 100%);">
+        <img [src]="profile.profileImage || 'assets/default-profile.png'"
+             alt="{{ profile.userId?.name || 'Default Profile' }}"
+             class="rounded-circle border border-white mb-3"
+             style="width: 120px; height: 120px; object-fit: cover;">
+             <h5 class="mb-1 text-center fs-5">{{ profile.userId?.name }}</h5>
+             <p class="mb-0 text-center small">{{ profile.description || 'Web Designer' }}</p>
+      </div>
+
+      <!-- Right Panel: Details -->
+      <div class="col-md-8 p-4 bg-light overflow-auto">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0 text-truncate  border-bottom pb-2 mb-4">Profile Information</h5>
+          <div>
+            <mat-icon class="icon text-danger me-3" (click)="CloseDialog()" aria-label="Close profile">exit_to_app</mat-icon>
+            <mat-icon class="icon text-primary" (click)="openedit()" aria-label="Edit profile">edit</mat-icon>
+          </div>
+        </div>
+
+        <p><strong>Email:</strong> <span class="text-muted text-truncate d-inline-block w-100">{{ profile.userId?.email }}</span></p>
+        <p><strong>Bio:</strong> <span class="text-muted text-truncate d-inline-block w-100">{{ profile.bio }}</span></p>
+        <p><strong>Description:</strong> <span class="text-muted text-truncate d-inline-block w-100">{{ profile.description }}</span></p>
+        <p><strong>Contact Number:</strong> <span class="text-muted">{{ profile.contactNumber }}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- If no profile exists, display this section -->
+  <div *ngIf="!profile" class="alert alert-danger text-center mt-4">
+    <p><strong>No profile found.</strong> Please create your profile.</p>
+    <button class="btn btn-primary" (click)="openedit()">Create Profile</button>
+  </div>
+</div>
+

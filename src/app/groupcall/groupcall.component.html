@@ -1,0 +1,44 @@
+<div class="container">
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Room controls -->
+  <div class="room-controls" *ngIf="!isInRoom">
+    <input [(ngModel)]="roomId" placeholder="Enter Room ID" />
+    <button (click)="createRoom()">🎲 Create Random Room</button>
+    <button (click)="joinRoom()">🔗 Join Room</button>
+  </div>
+
+  <!-- In-call controls -->
+  <div *ngIf="isInRoom" class="controls-bar">
+    <div class="room-id-display">
+      Room ID: <strong>{{ roomId }}</strong>
+    </div>
+    <button (click)="endCall()">❌ End Call</button>
+    <button (click)="leaveRoom()">🚪 Leave Room</button>
+    <button (click)="toggleMic()">
+      {{ micEnabled ? '🔊 Mute' : '🔇 Unmute' }}
+    </button>
+    <button (click)="toggleCamera()">
+      {{ cameraEnabled ? '📷 Off' : '📸 On' }}
+    </button>
+    <button (click)="shareScreen()">🖥 Share Screen</button>
+  </div>
+
+  <!-- Video grid -->
+  <div class="video-grid" *ngIf="isInRoom" [ngStyle]="{'grid-template-columns': gridTemplateColumns()}">
+    <!-- Local video -->
+    <div class="video-container" *ngIf="localStream">
+      <video [srcObject]="localStream" autoplay playsinline muted></video>
+      <div class="video-label">You</div>
+    </div>
+
+    <!-- Remote videos -->
+    <div class="video-container" *ngFor="let stream of remoteStreams | keyvalue">
+      <video [srcObject]="stream.value" autoplay playsinline></video>
+      <div class="video-label">Participant {{ stream.key }}</div>
+    </div>
+  </div>
+</div>

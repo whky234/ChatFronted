@@ -1,0 +1,46 @@
+<div class="container-fluid p-3">
+  <div class="card mx-auto" style="max-width: 600px; max-height: 90vh; overflow: auto;">
+    <div class="card-body">
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-outline-secondary btn-sm" (click)="closeDialog()" title="Close">
+          <i class="bi bi-box-arrow-right"></i> <!-- Bootstrap icon -->
+        </button>
+      </div>
+
+      <h4 class="text-center mb-4">Your Profile</h4>
+
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="mb-3">
+          <label class="form-label">Bio</label>
+          <input formControlName="bio" type="text" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea formControlName="description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Contact Number</label>
+          <input formControlName="contactNumber" type="tel" class="form-control" />
+        </div>
+
+
+
+        <div class="mb-3">
+          <label class="form-label">Profile Image</label>
+          <input type="file" class="form-control" (change)="onImageChange($event)" />
+        </div>
+
+        <div class="form-check mb-3">
+          <input type="checkbox" class="form-check-input" id="hideProfile" formControlName="isHidden" />
+          <label class="form-check-label" for="hideProfile">Hide Profile from Search</label>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn text-white" style="background-color: darkgreen;">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<h2 mat-dialog-title class="d-flex align-items-center gap-2 text-primary border-bottom pb-2 mb-3">
+  <mat-icon color="primary">group</mat-icon>
+  <span>Group Details</span>
+</h2>
+
+<div mat-dialog-content class="container">
+  <div class="mb-3">
+    <p class="d-flex align-items-center gap-2">
+      <mat-icon color="accent">person</mat-icon>
+      <strong>Admin:</strong>
+      <span class="text-dark">{{ data.admin }}</span>
+    </p>
+  </div>
+
+  <div *ngIf="(groupMembers$ | async) as members; else loading">
+    <div *ngIf="members?.length">
+      <h5 class="d-flex align-items-center gap-2 text-danger border-bottom pb-1 mb-3">
+        <mat-icon color="warn">people</mat-icon> Group Members
+      </h5>
+
+      <ul class="list-group">
+        <li class="list-group-item d-flex align-items-center" *ngFor="let member of members">
+          <mat-icon color="primary" class="me-2">person</mat-icon>
+          <span class="fw-medium">{{ member?.name }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="text-muted">Loading members...</div>
+  </ng-template>
+</div>
+
+<div mat-dialog-actions class="d-flex justify-content-end mt-4">
+  <button mat-button mat-dialog-close class="btn btn-outline-secondary">
+    <mat-icon class="me-1">close</mat-icon> Close
+  </button>
+</div>

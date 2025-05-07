@@ -1,0 +1,63 @@
+<div class="notification-container">
+  <h3 class="notification-title">Notifications</h3>
+  <button mat-icon-button class="close-btn" (click)="closeDialog()">
+    <mat-icon>close</mat-icon>
+  </button>
+
+   <!-- Mark All as Read Button -->
+   <button mat-button class="mark-all-read-btn" (click)="markAllAsRead()">
+    Mark All as Read
+  </button>
+
+  <!-- Material Tabs -->
+  <mat-tab-group>
+    <!-- Personal Notifications Tab -->
+    <mat-tab label="Personal Messages" label="Personal ({{ personalCount }})">
+      <div class="notification-list" cdkScrollable *ngIf="notifications.length; else noNotifications">
+        <mat-list>
+          <mat-list-item *ngFor="let notification of notifications"  >
+            <mat-icon class="notification-icon">notifications</mat-icon>
+            <div  *ngFor="let user of senderDetails" class="notification-content">
+              <p class="message" >{{ notification.message }}</p>
+              <small class="timestamp">{{ notification.createdAt | date:'short' }}</small>
+            </div>
+            <button mat-icon-button>
+              <mat-icon>volume_off</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>done</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <ng-template #noNotifications>
+        <p class="no-notifications">You have no new notifications.</p>
+      </ng-template>
+    </mat-tab>
+
+    <!-- Group Notifications Tab -->
+    <mat-tab label="Group Messages" label="Group ({{ groupCount }})">
+      <div class="notification-list" cdkScrollable *ngIf="groupNotifications.length; else noGroupNotifications">
+        <mat-list>
+          <mat-list-item *ngFor="let notification of groupNotifications">
+            <mat-icon class="notification-icon">group</mat-icon>
+            <div class="notification-content">
+              <p class="message">{{ notification.message }}</p>
+              <small class="timestamp">{{ notification.createdAt | date:'short' }}</small>
+            </div>
+            <button mat-icon-button>
+              <mat-icon>volume_off</mat-icon>
+            </button>
+            <button mat-icon-button>
+              <mat-icon>done</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <ng-template #noGroupNotifications>
+        <p class="no-notifications">No new group notifications.</p>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+

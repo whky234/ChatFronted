@@ -1,0 +1,102 @@
+<section class="vh-100">
+  <div class="container h-100">
+    <div class="row justify-content-center align-items-center h-100">
+
+      <!-- Form Card -->
+      <div class="col-md-10 col-lg-8">
+        <div class="card shadow border-0 p-0 overflow-hidden rounded-4">
+          <div class="row g-0 h-100">
+
+            <!-- Left image with border -->
+            <div class="col-md-6 left-section border-end">
+              <img src="https://img.freepik.com/free-vector/glossy-style-login-page-template_1017-31859.jpg?ga=GA1.1.545914860.1720880628&semt=ais_hybrid&w=740"
+                   class="img-fluid h-100 w-100 object-fit-cover" alt="Login image">
+            </div>
+
+            <!-- Right form with padding and border -->
+            <div class="col-md-6 right-section">
+              <div class="card-body p-4">
+                <form>
+                  <div class="text-center mb-4">
+                    <p class="lead fw-normal">Sign in with</p>
+                    <div class="d-flex justify-content-center gap-3">
+                      <button type="button" class="btn btn-primary btn-floating">
+                        <i class="fab fa-facebook-f"></i>
+                      </button>
+                      <button type="button" class="btn btn-info btn-floating text-white">
+                        <i class="fab fa-twitter"></i>
+                      </button>
+                      <button type="button" (click)="googleLogin()" class="btn btn-danger btn-floating">
+                        <i class="fab fa-google"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="divider d-flex align-items-center my-4">
+                    <span class="text-muted fw-bold mx-3">Or</span>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="form-outline mb-3">
+                    <input [(ngModel)]="email" name="email" placeholder="Enter email" required  id="username" class="form-control"  required />
+                    <label class="form-label" for="email">Email address</label>
+                  </div>
+
+                  <!-- Password -->
+                  <div class="form-outline mb-3">
+                    <input [(ngModel)]="password" name="password" type="password" placeholder="Enter password" class="form-control"  required />
+                    <label class="form-label" for="password">Password</label>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a routerLink="/forgot-password" class="text-decoration-none">Forgot password?</a>
+                  </div>
+
+                  <div class="text-center">
+                    <button  class="btn btn-primary w-100 mb-3" (click)="onLogin()">Login</button>
+                    <p class="small">Don't have an account? <a href="#" class="text-danger" routerLink="/signup">Register</a></p>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!--
+
+<div class="container">
+
+  <div class="background">
+    <div class="shape top-left"></div>
+    <div class="shape top-right"></div>
+    <div class="shape bottom-left"></div>
+    <div class="shape bottom-right"></div>
+  </div>
+
+<form>
+  <h3>Login Here</h3>
+
+  <label for="username">Email</label>
+  <input [(ngModel)]="email" name="email" placeholder="Enter email" required  id="username">
+
+  <label for="password">Password</label>
+  <input [(ngModel)]="password" name="password" type="password" placeholder="Enter password" requiredid="password">
+  <a routerLink="/forgot-password">Forgot password</a>
+
+  <button (click)="onLogin()">Log In</button>
+  <div class="social">
+    <button class="go" (click)="googleLogin()"><i class="fab fa-google"></i> Google</button>
+    <button routerLink="/signup"> Signup</button>
+  </div>
+</form>
+</div> -->

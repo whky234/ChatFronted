@@ -1,0 +1,32 @@
+/* Default styles */
+.profile-container {
+  max-height: 100vh; /* Prevent overflow beyond the viewport height */
+  overflow-y: auto; /* Enable scrolling when needed */
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Default image size */
+.profile-container img {
+  width: 150px; /* Default size for larger screens */
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
+/* Ensure smooth scrolling on mobile */
+@media (max-width: 768px) {
+  .profile-container {
+    max-height: 90vh; /* Slightly reduce height for better spacing */
+    overflow-y: auto; /* Enable scrolling when content exceeds 100vh */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+
+
+  }
+
+  .profile-container img {
+    width: 100px; /* Reduce size on small screens */
+    height: 100px;
+  }
+}

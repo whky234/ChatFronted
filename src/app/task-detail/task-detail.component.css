@@ -1,0 +1,53 @@
+.task-detail {
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Light gradient with soft blue and white */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Slightly deeper shadow for a modern look */
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.task-detail h2,
+.task-detail h3 {
+  display: flex;
+  align-items: center;
+}
+
+.task-detail h2 .detail-icon,
+.task-detail h3 .history-icon {
+  margin-left: 10px;
+  color: #4a90e2; /* Soft blue for icons */
+}
+
+.task-detail p {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.task-detail p i {
+  margin-left: 10px;
+  color: #4a90e2; /* Consistent icon color */
+}
+
+.task-detail .close-btn {
+  background: #e74c3c; /* Red for emphasis */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.task-detail .close-btn:hover {
+  background: #c0392b; /* Slightly darker red on hover */
+  transform: scale(1.05); /* Subtle hover effect */
+}
+
+.task-detail .close-btn .close-icon {
+  margin-left: 10px;
+}

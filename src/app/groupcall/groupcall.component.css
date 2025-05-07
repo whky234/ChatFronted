@@ -1,0 +1,165 @@
+/* Container styling */
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #44524a;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.room-id-display {
+  font-size: 14px;
+  color: #333;
+  margin-right: auto;
+  padding-right: 20px;
+}
+
+
+/* Room Controls */
+.room-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.room-controls input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ddd;
+  width: 100%;
+  max-width: 300px;
+  background-color: #333;
+  color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.room-controls input:focus {
+  border-color: #00bfa5;
+  outline: none;
+}
+
+.room-controls button {
+  padding: 0.6rem 1.2rem;
+  background-color: #00bfa5;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.room-controls button:hover {
+  background-color: #009e88;
+  transform: scale(1.05);
+}
+
+/* Controls bar */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.controls-bar button {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  background-color: #222;
+  color: #fff;
+  transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.controls-bar button:hover {
+  background-color: #333;
+  transform: scale(1.05);
+}
+
+/* Grid layout */
+.video-grid {
+  display: grid;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.video-container {
+  position: relative;
+  background-color: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  animation: fadeIn 0.5s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 0.4rem;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 0.85rem;
+  text-align: center;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive Grid Columns */
+@media (min-width: 320px) {
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 600px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .video-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .video-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

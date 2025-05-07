@@ -1,0 +1,28 @@
+.full-width {
+  width: 100%;
+}
+.container{
+  background-color: #f1f2f2f6;
+}
+
+mat-dialog-content {
+  min-width: 300px;
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.image-upload {
+  margin: 10px 0;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+  margin-top: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,58 @@
+<div class="chat-containers">
+  <!-- Header -->
+  <mat-toolbar class="header-toolbar">
+    <!-- Left: Logo -->
+    <div class="logo">
+      <img *ngIf="getimage.profileImage" [src]="getimage.profileImage" alt="Profile Image" class="profile-image" />
+      SwiftChatPro
+    </div>
+
+    <!-- Hamburger Menu (visible on small screens) -->
+    <button mat-icon-button class="hamburger-menu" (click)="toggleMobileMenu()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <!-- Center: Navigation Icons (hidden on small screens if menu toggled) -->
+    <div class="nav-icons desktop-only" [class.show-mobile-menu]="mobileMenuOpen">
+      <button mat-icon-button (click)="logout()" title="Exit Group"><mat-icon>exit_to_app</mat-icon></button>
+      <button mat-icon-button (click)="toggleGroups()" title="Show Groups"><mat-icon>group</mat-icon></button>
+      <button mat-icon-button (click)="openNotificationDialog()" title="Notifications">
+        <mat-icon>notifications</mat-icon>
+        <span *ngIf="personalCount + groupCount > 0" class="notification-badge">{{ personalCount + groupCount }}</span>
+      </button>
+      <button mat-icon-button (click)="openprofileList()" title="Create Profile"><mat-icon>person</mat-icon></button>
+      <button mat-icon-button (click)="openAiChatBot()" title="AI Chatbot"><mat-icon>smart_toy</mat-icon></button>
+      <button mat-icon-button (click)="openSettingsDialog()" title="Settings"><mat-icon>settings</mat-icon></button>
+      <button mat-icon-button (click)="scheduleMeeting()" title="Schedule Meeting"><mat-icon>calendar_today</mat-icon></button>
+      <button mat-icon-button (click)="openVideos()" title="Call Room"><mat-icon>videocam</mat-icon></button>
+    </div>
+
+    <!-- Right: User Info -->
+    <div class="user-info" (click)="viewprofileList()">
+      <span class="user-name">{{ currentUser?.name }}</span>
+      <button mat-icon-button><mat-icon>account_circle</mat-icon></button>
+    </div>
+  </mat-toolbar>
+
+
+  <!-- Main Body -->
+  <div class="main-content">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <app-userlist (userSelected)="onUserSelected($event)" (groupSelected)="onGroupSelected($event)"></app-userlist>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="chat-section">
+      <app-groupchatwindow *ngIf="selectedGroup" [group]="selectedGroup" [currentUser]="currentUser"></app-groupchatwindow>
+      <app-chatwindow *ngIf="selectedUser && !selectedGroup" [selectedUser]="selectedUser" [currentUser]="currentUser"></app-chatwindow>
+
+      <p *ngIf="!selectedUser && !selectedGroup" class="no-messages">
+        No participant or group selected. Select a participant or group to start chatting.
+        <img src="/assets/7419606.jpg" alt="No messages">
+      </p>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>

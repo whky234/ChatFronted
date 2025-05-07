@@ -1,0 +1,25 @@
+.container {
+  text-align: center;
+  margin-top: 20px;
+}
+.video-card {
+  padding: 20px;
+  width: 400px;
+  margin: auto;
+}
+.controls {
+  margin-bottom: 10px;
+}
+.video-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+video {
+  width: 45%;
+  border-radius: 8px;
+  background: black;
+}
+.toggle-buttons {
+  margin-top: 10px;
+}

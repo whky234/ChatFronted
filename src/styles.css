@@ -1,1 +1,88 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /* Light Theme Variables */
+  --primary-color: #6200ea;
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --toolbar-background: #f5f5f5;
+  --sidebar-background: #e0e0e0;
+  --chat-background: #fafafa;
+  --input-background: #ffffff;
+  --button-color: #6200ea;
+  --icon-color: #000000;
+}
+
+.dark-mode {
+  /* Dark Theme Variables */
+  --primary-color: #bb86fc;
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --toolbar-background: #1f1f1f;
+  --sidebar-background: #1e1e1e;
+  --chat-background: #2c2c2c;
+  --input-background: #333333;
+  --button-color: #bb86fc;
+  --icon-color: #ffffff;
+}
+
+/* Apply Styles */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+mat-toolbar {
+  background-color: var(--toolbar-background);
+  color: var(--text-color);
+}
+
+.sidebar {
+  background-color: var(--sidebar-background);
+  color: var(--text-color);
+}
+
+.chat-section {
+  background-color: var(--chat-background);
+}
+
+mat-icon {
+  color: var(--icon-color);
+}
+
+button {
+  background-color: var(--button-color);
+  color: var(--text-color);
+}
+
+input, textarea {
+  background-color: var(--input-background);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+}
+
+.no-messages {
+  color: var(--text-color);
+}
+.cdk-overlay-container {
+  z-index: 1055 !important; /* Bootstrap modal z-index is 1050, so we set a higher value */
+}
+
+/* /* .cdk-overlay-backdrop {
+  z-index: 1054 !important;
+} */
+/* For full-height dialog and scroll support */
+.custom-dialog-container .mat-dialog-container {
+  padding: 0 !important;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: auto;
+  border-radius: 0;
+}
+
+/* Optional: Hide scrollbar on webkit for cleaner look */
+.custom-dialog-container .mat-dialog-container::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-dialog-container .mat-dialog-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}

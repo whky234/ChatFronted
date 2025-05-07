@@ -1,0 +1,492 @@
+<div class="chat-container">
+  <!-- Header with participant's name and call options -->
+  <div class="chat-header">
+    <div class="header-left" (click)="openViewGroupDetail(group.id)" *ngIf=" !isSearching">
+      <img
+        *ngIf="group.image"
+        [src]="group.image"
+        alt="{{ group.name }}"
+        class="group-image"
+      />
+
+      <span class="participant-name">{{ group.name }}</span
+      ><br />
+    </div>
+     <!-- Search Input -->
+     <div class="search-container" *ngIf="isSearching">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search messages..."
+        [(ngModel)]="searchQuery"
+        (input)="filterMessages()"
+      />
+      <mat-icon class="close-icon" (click)="toggleSearch()">close</mat-icon>
+    </div>
+    <div class="header-right">
+      <mat-icon *ngIf="!isSearching" class="icon search-icon" (click)="toggleSearch()">search</mat-icon>
+
+      <mat-icon class="icon video-call-icon" >videocam</mat-icon>
+
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="menu"
+        aria-label="More Options"
+      >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button
+          *ngIf="group.admin?._id === currentUser._id"
+          mat-menu-item
+          (click)="openCreateTask()"
+        >
+          <mat-icon>add_task</mat-icon>
+          <span>Create Task</span>
+        </button>
+        <button mat-menu-item (click)="openTaskList()">
+          <mat-icon>list</mat-icon>
+          <span>Task View</span>
+        </button>
+        <button
+          *ngIf="group.admin?._id === currentUser._id"
+          mat-menu-item
+          (click)="openAddMembersDialog()"
+        >
+          <mat-icon>person_add</mat-icon>
+          <span>Add Members</span>
+        </button>
+
+        <button mat-menu-item (click)="leaveGroup(group._id)">
+          <mat-icon>person_add</mat-icon>
+          <span>Leave group</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- Chat messages window -->
+  <div class="chat-window" #chatWindow #chatContainer>
+    <div *ngIf="messages.length === 0" class="empty-chat">
+      <p>No messages yet. Start the conversation!</p>
+    </div>
+    <!-- Scroll to Bottom Button -->
+    <button
+    class="scroll-to-bottom"
+    *ngIf="showScrollButton"
+    (click)="scrollToBottom()"
+  >
+    <mat-icon>arrow_downward</mat-icon>
+  </button>
+
+
+    <div *ngIf="!searchQuery!">
+    <div
+      *ngFor="let message of messages"
+      class="message"
+      [ngClass]="{
+        sent: message.type === 'sent',
+        received: message.type === 'received'
+      }"
+      class="message"
+    >
+      <!-- Sender Name -->
+      <span class="message-meta">{{ message.sender.name }}</span
+      ><br />
+
+      <!-- Message Text -->
+      <p *ngIf="!message.deleted">
+        {{ message.text }} <span *ngIf="message.edited">(edited)</span>
+      </p>
+      <p *ngIf="message.deleted" class="deleted-message">Message deleted</p>
+
+      <!-- Time -->
+      <span class="message-time">{{ message.time | date : "short" }}</span>
+
+      <!-- Display receiver names (for reference) -->
+      <!-- <span *ngIf="message.receiverNames" class="message-meta">
+        <strong>Sent to:</strong> {{ message.receiverNames }}
+      </span> -->
+
+      <!-- File or Image Preview -->
+      <div *ngIf="message.fileUrl">
+        <ng-container
+          *ngIf="
+            message.fileUrl.endsWith('.jpg') ||
+            message.fileUrl.endsWith('.jpeg') ||
+            message.fileUrl.endsWith('.png') ||
+            message.fileUrl.endsWith('.avif')
+          "
+        >
+          <a [href]="message.fileUrl" download>
+            <img
+              [src]="message.fileUrl"
+              class="image-preview"
+              alt="Image Preview"
+            />
+          </a>
+        </ng-container>
+
+        <ng-template #fileDownload>
+          <a [href]="message.fileUrl" target="_blank" download>
+            Download File
+          </a>
+        </ng-template>
+      </div>
+
+      <!-- Video Preview -->
+      <div
+        class="video-preview"
+        *ngIf="message.fileUrl && message.fileUrl.endsWith('.mp4')"
+      >
+        <video class="video" width="300" controls>
+          <source [src]="message.fileUrl" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- Audio Preview -->
+      <div class="audio-preview" *ngIf="message.audioUrl">
+        <audio controls>
+          <source [src]="message.audioUrl" type="audio/wav" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <div *ngIf="message.fileUrl && message.fileUrl.endsWith('.pdf')">
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download PDF Document
+        </a>
+      </div>
+
+      <!-- Word Document Preview (Only Download) -->
+      <div
+        *ngIf="
+          message.fileUrl &&
+          (message.fileUrl.endsWith('.doc') ||
+            message.fileUrl.endsWith('.docx'))
+        "
+      >
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download Word Document
+        </a>
+      </div>
+
+      <!-- ZIP File Download -->
+      <div *ngIf="isZipFile(message.fileUrl)">
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download ZIP File
+        </a>
+      </div>
+
+      <!-- Three-dot menu for options -->
+      <div class="message-options">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="menu"
+          aria-label="More Options"
+        >
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button
+            *ngIf="message.type === 'sent'"
+            mat-menu-item
+            (click)="deleteMessageForEveryone(message._id)"
+          >
+            <mat-icon>delete_forever</mat-icon>
+            <span>Delete For Everyone</span>
+          </button>
+          <button
+            *ngIf="message.type === 'sent' || message.type === 'received'"
+            mat-menu-item
+            (click)="deleteMessageForMe(message._id)"
+          >
+            <mat-icon>delete</mat-icon>
+            <span>Delete for Me</span>
+          </button>
+
+          <!-- ✅ Edit Message Button (only for sender) -->
+          <button
+            *ngIf="message.type === 'sent'"
+            mat-menu-item
+            (click)="enableEditMode(message)"
+          >
+            <mat-icon>edit</mat-icon>
+            <span>Edit Message</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- ✅ Edit Message Input -->
+      <!-- ✅ Edit Message Input -->
+      <div
+        *ngIf="editingMessage && editingMessage._id === message._id"
+        class="edit-message-container"
+      >
+        <mat-form-field appearance="outline" class="edit-input">
+          <input
+            matInput
+            [(ngModel)]="editedText"
+            type="text"
+            placeholder="Edit message..."
+          />
+        </mat-form-field>
+
+        <div class="edit-actions">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="updateMessage(message._id)"
+          >
+            <mat-icon>check</mat-icon>
+            <!-- Save Icon -->
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit()">
+            <mat-icon>close</mat-icon>
+            <!-- Cancel Icon -->
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="searchQuery!">
+    <div
+      *ngFor="let message of filteredMessages"
+      class="message"
+      [ngClass]="{
+        sent: message.type === 'sent',
+        received: message.type === 'received'
+      }"
+      class="message"
+    >
+      <!-- Sender Name -->
+      <span class="message-meta">{{ message.sender.name }}</span
+      ><br />
+
+      <!-- Message Text -->
+      <p *ngIf="!message.deleted">
+        {{ message.text }}
+      </p>
+      <p *ngIf="message.deleted" class="deleted-message">Message deleted</p>
+
+      <!-- Time -->
+      <span class="message-time">{{ message.time | date : "short" }}</span>
+
+      <!-- Display receiver names (for reference) -->
+      <!-- <span *ngIf="message.receiverNames" class="message-meta">
+        <strong>Sent to:</strong> {{ message.receiverNames }}
+      </span> -->
+
+      <!-- File or Image Preview -->
+      <div *ngIf="message.fileUrl">
+        <ng-container
+          *ngIf="
+            message.fileUrl.endsWith('.jpg') ||
+            message.fileUrl.endsWith('.jpeg') ||
+            message.fileUrl.endsWith('.png') ||
+            message.fileUrl.endsWith('.avif')
+          "
+        >
+          <a [href]="message.fileUrl" download>
+            <img
+              [src]="message.fileUrl"
+              class="image-preview"
+              alt="Image Preview"
+            />
+          </a>
+        </ng-container>
+
+        <ng-template #fileDownload>
+          <a [href]="message.fileUrl" target="_blank" download>
+            Download File
+          </a>
+        </ng-template>
+      </div>
+
+      <!-- Video Preview -->
+      <div
+        class="video-preview"
+        *ngIf="message.fileUrl && message.fileUrl.endsWith('.mp4')"
+      >
+        <video class="video" width="300" controls>
+          <source [src]="message.fileUrl" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- Audio Preview -->
+      <div class="audio-preview" *ngIf="message.audioUrl">
+        <audio controls>
+          <source [src]="message.audioUrl" type="audio/wav" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+
+      <div *ngIf="message.fileUrl && message.fileUrl.endsWith('.pdf')">
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download PDF Document
+        </a>
+      </div>
+
+      <!-- Word Document Preview (Only Download) -->
+      <div
+        *ngIf="
+          message.fileUrl &&
+          (message.fileUrl.endsWith('.doc') ||
+            message.fileUrl.endsWith('.docx'))
+        "
+      >
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download Word Document
+        </a>
+      </div>
+
+      <!-- ZIP File Download -->
+      <div *ngIf="isZipFile(message.fileUrl)">
+        <a [href]="message.fileUrl" target="_blank" download>
+          Download ZIP File
+        </a>
+      </div>
+
+      <!-- Three-dot menu for options -->
+      <div class="message-options">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="menu"
+          aria-label="More Options"
+        >
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button
+            *ngIf="message.type === 'sent'"
+            mat-menu-item
+            (click)="deleteMessageForEveryone(message._id)"
+          >
+            <mat-icon>delete_forever</mat-icon>
+            <span>Delete For Everyone</span>
+          </button>
+          <button
+            *ngIf="message.type === 'sent' || message.type === 'received'"
+            mat-menu-item
+            (click)="deleteMessageForMe(message._id)"
+          >
+            <mat-icon>delete</mat-icon>
+            <span>Delete for Me</span>
+          </button>
+
+          <!-- ✅ Edit Message Button (only for sender) -->
+          <button
+            *ngIf="message.type === 'sent'"
+            mat-menu-item
+            (click)="enableEditMode(message)"
+          >
+            <mat-icon>edit</mat-icon>
+            <span>Edit Message</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- ✅ Edit Message Input -->
+      <!-- ✅ Edit Message Input -->
+      <div
+        *ngIf="editingMessage && editingMessage._id === message._id"
+        class="edit-message-container"
+      >
+        <mat-form-field appearance="outline" class="edit-input">
+          <input
+            matInput
+            [(ngModel)]="editedText"
+            type="text"
+            placeholder="Edit message..."
+          />
+        </mat-form-field>
+
+        <div class="edit-actions">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="updateMessage(message._id)"
+          >
+            <mat-icon>check</mat-icon>
+            <!-- Save Icon -->
+          </button>
+          <button mat-icon-button color="warn" (click)="cancelEdit()">
+            <mat-icon>close</mat-icon>
+            <!-- Cancel Icon -->
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div *ngIf="typingUsers.length > 0" class="typing-indicator">
+      <span *ngFor="let user of typingUsers">{{ user }}</span>
+      <span *ngIf="typingUsers.length === 1"> is typing...</span>
+      <span *ngIf="typingUsers.length > 1"> are typing...</span>
+    </div>
+  </div>
+
+  <div class="emoji-grid" *ngIf="selectemoji">
+    <mat-spinner *ngIf="isprogress"></mat-spinner>
+    <div class="emoji-item" *ngFor="let emoji of emojis" (click)="appendEmoji(emoji)">
+      <span>{{ emoji }}</span>
+    </div>
+  </div>
+
+  <!-- Message input area with emoji, voice recorder, and send button -->
+  <div class="chat-input-section">
+    <button mat-icon-button class="emoji-btn" (click)="onSelectEmoji()" aria-label="Emoji">
+      <mat-icon>emoji_emotions</mat-icon>
+    </button>
+
+    <!-- File sharing button -->
+    <input
+      #fileInput
+      type="file"
+      accept="image/*,video/*"
+      hidden
+      (change)="handleFileUpload($event)"
+    />
+    <button mat-icon-button class="file-btn" (click)="fileInput.click()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      class="audio-btn"
+      aria-label="Record Audio"
+      (click)="isRecording ? stopRecording() : startRecording()"
+    >
+      <mat-icon>{{ isRecording ? "stop" : "mic" }}</mat-icon>
+    </button>
+
+    <input
+      type="text"
+      placeholder="Type a message..."
+      class="message-input"
+      [(ngModel)]="messageText"
+      (keydown.enter)="sendMessage()"
+      (keydown)="onTyping()"
+    />
+
+    <button
+      mat-icon-button
+      class="send-btn"
+      aria-label="Send Message"
+      (click)="sendMessage()"
+    >
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+  <div *ngIf="audioUrl" class="audio-preview">
+    <audio [src]="audioUrl" controls></audio>
+    <button mat-icon-button (click)="sendAudioMessage()">
+      <mat-icon>send</mat-icon>
+    </button>
+    <button mat-icon-button (click)="clearAudioRecording()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

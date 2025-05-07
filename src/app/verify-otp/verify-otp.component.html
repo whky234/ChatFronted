@@ -1,0 +1,52 @@
+<!-- <div>
+  <h1>Please check the email </h1>
+  <h2>Verify OTP</h2>
+  <form>
+    <input [(ngModel)]="email" name="email" placeholder="Enter email" required />
+    <input [(ngModel)]="otp" name="otp" placeholder="Enter OTP" required />
+    <button (click)="onVerifyOTP()">Verify OTP</button>
+  </form>
+  <p *ngIf="message">{{ message }}</p>
+</div> -->
+
+
+<div class="d-flex flex-column align-items-center justify-content-center vh-100  text-white">
+  <div class="reset-card bg-white text-dark p-5 rounded shadow" style="max-width: 400px; width: 100%;">
+    <h2 class="text-center fw-bold mb-3">Verify OTP</h2>
+    <p class="text-center text-muted mb-4">
+      Please check the email
+    </p>
+
+    <form (ngSubmit)="onVerifyOTP()" class="w-100">
+      <div class="mb-3">
+        <input
+          type="email"
+          class="form-control mb-3"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        />
+
+        <input
+
+          class="form-control"
+          [(ngModel)]="otp" name="otp" placeholder="Enter OTP" required
+          required
+        />
+      </div>
+
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary btn-block">Reset My Password</button>
+      </div>
+
+      <div *ngIf="message" class="alert alert-success mt-3 text-center p-2" role="alert">
+        {{ message }}
+      </div>
+    </form>
+  </div>
+
+  <footer class="mt-4 small text-white-50 text-center">
+    © 2025 Reset Password Form. All rights reserved. | Template by You
+  </footer>
+</div>

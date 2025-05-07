@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Add Members</h2>
+<mat-dialog-content>
+  <mat-form-field class="full-width">
+    <mat-label>Select Users</mat-label>
+    <mat-select multiple [(ngModel)]="selectedMembers">
+      <mat-option *ngFor="let user of users" [value]="user.userId._id">
+        {{ user.name }}
+        {{user.userId._id}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button color="primary" (click)="onAdd()">Add</button>
+</mat-dialog-actions>
