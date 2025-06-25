@@ -8,10 +8,19 @@
 </div>
 
 <div class="search-wrapper">
-  <div style="position: relative;">
-    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+  <div style="position: relative">
+    <svg
+      class="search-icon"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
     </svg>
     <input
       type="text"
@@ -21,8 +30,6 @@
     />
   </div>
 </div>
-
-
 
 <div class="kanban-board">
   <!-- Pending Tasks Column -->
@@ -59,6 +66,7 @@
           </p>
           <select
             [ngClass]="{ 'disabled-text': !isAssignedToCurrentUser(task) }"
+            [disabled]="assignee.userId?._id !== currentuser"
             #statusSelect
             (change)="
               updateStatus(task._id, assignee.userId._id, statusSelect.value)
@@ -142,6 +150,7 @@
           </p>
           <select
             [ngClass]="{ 'disabled-text': !isAssignedToCurrentUser(task) }"
+            [disabled]="assignee.userId?._id !== currentuser"
             #statusSelect
             (change)="
               updateStatus(task._id, assignee.userId._id, statusSelect.value)
@@ -196,13 +205,15 @@
       'completedTasks'
     ]"
     [cdkDropListData]="inReviewTasks"
-
     (cdkDropListDropped)="drop($event, 'in-review')"
-
   >
     <h3>In Review</h3>
     <div *ngIf="inReviewTasks.length > 0; else noInReviewTasks">
-      <div *ngFor="let task of filteredInReviewTasks" class="task-card" cdkDrag   [cdkDragDisabled]="task?.createdBy?._id !== currentuser"
+      <div
+        *ngFor="let task of filteredInReviewTasks"
+        class="task-card"
+        cdkDrag
+        [cdkDragDisabled]="task?.createdBy?._id !== currentuser"
       >
         <h4>{{ task.title }}</h4>
         <p>{{ task.description }}</p>
@@ -216,9 +227,12 @@
             {{ assignee.status }}
           </p>
           <select
+                      [disabled]=" assignee.userId?._id !== currentuser "
+
             #statusSelect
             (change)="
               updateStatus(task._id, assignee.userId._id, statusSelect.value)
+
             "
           >
             <option value="pending" [selected]="assignee.status === 'pending'">
@@ -237,6 +251,7 @@
               In Review
             </option>
             <option
+              *ngIf="task.createdBy._id === currentuser"
               value="completed"
               [selected]="assignee.status === 'completed'"
             >
@@ -254,12 +269,12 @@
             <input
               type="file"
               (change)="uploadFile($event, task._id)"
-              accept=".pdf,.docx,.txt,.png,.jpg"
+              accept=".pdf,.docx,.txt,.png,.jpg,.zip"
             />
           </div>
 
           <!-- File Download (Visible only to the creator when task is in review) -->
-          <div *ngIf="task.createdBy._id===currentuser">
+          <div *ngIf="task.createdBy._id === currentuser">
             <div *ngFor="let assignee of task?.assignedTo">
               <p>{{ assignee.userId.name }}'s Uploaded File:</p>
 
@@ -277,6 +292,7 @@
               <p *ngIf="!assignee.fileUrl" class="no-file">
                 No file uploaded by {{ assignee.userId.name }}
               </p>
+             
             </div>
           </div>
 
@@ -299,52 +315,54 @@
 
   <!-- Completed Tasks Column -->
   <div
-  class="column"
-  id="completedTasks"
-  cdkDropList
-  [cdkDropListConnectedTo]="['pendingTasks', 'inProgressTasks', 'inReviewTasks']"
-  [cdkDropListData]="completedTasks"
-  (cdkDropListDropped)="drop($event, 'completed')"
->
-  <h3>Completed</h3>
-  <div *ngIf="completedTasks.length > 0; else noCompletedTasks">
-    <div
-      *ngFor="let task of filteredCompletedTasks"
-      class="task-card"
-      cdkDrag
-      [cdkDragDisabled]="!isAssignedToCurrentUser(task)"
-    >
-      <h4>{{ task.title }}</h4>
-      <p>{{ task.description }}</p>
-      <p>Assigned To: {{ getAssignedToNames(task) }}</p>
-      <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
-      <p>Due Date: {{ task.deadline | date }}</p>
-      <div *ngFor="let assignee of task?.assignedTo">
-        <p>
-          {{ assignee.userId.name || "Unassigned" }}'s Status:
-          {{ assignee.status }}
-        </p>
-        <p *ngIf="assignee.fileUrl">
-          Uploaded File:
-          <a [href]="assignee.fileUrl" download>
-            <mat-icon>cloud_download</mat-icon> Download
-          </a>
-        </p>
-      </div>
-      <button
-        *ngIf="task?.createdBy?._id === currentuser"
-        mat-icon-button
-        color="warn"
-        (click)="deleteTask(task._id)"
+    class="column"
+    id="completedTasks"
+    cdkDropList
+    [cdkDropListConnectedTo]="[
+      'pendingTasks',
+      'inProgressTasks',
+      'inReviewTasks'
+    ]"
+    [cdkDropListData]="completedTasks"
+    (cdkDropListDropped)="drop($event, 'completed')"
+  >
+    <h3>Completed</h3>
+    <div *ngIf="completedTasks.length > 0; else noCompletedTasks">
+      <div
+        *ngFor="let task of filteredCompletedTasks"
+        class="task-card"
+        cdkDrag
+        [cdkDragDisabled]="!isAssignedToCurrentUser(task)"
       >
-        <mat-icon>delete</mat-icon>
-      </button>
+        <h4>{{ task.title }}</h4>
+        <p>{{ task.description }}</p>
+        <p>Assigned To: {{ getAssignedToNames(task) }}</p>
+        <p *ngIf="task?.createdBy">Created By: {{ task.createdBy.name }}</p>
+        <p>Due Date: {{ task.deadline | date }}</p>
+        <div *ngFor="let assignee of task?.assignedTo">
+          <p>
+            {{ assignee.userId.name || "Unassigned" }}'s Status:
+            {{ assignee.status }}
+          </p>
+          <p *ngIf="assignee.fileUrl">
+            Uploaded File:
+            <a [href]="assignee.fileUrl" download>
+              <mat-icon>cloud_download</mat-icon> Download
+            </a>
+          </p>
+        </div>
+        <button
+          *ngIf="task?.createdBy?._id === currentuser"
+          mat-icon-button
+          color="warn"
+          (click)="deleteTask(task._id)"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
     </div>
+    <ng-template #noCompletedTasks>
+      <p>No completed tasks available.</p>
+    </ng-template>
   </div>
-  <ng-template #noCompletedTasks>
-    <p>No completed tasks available.</p>
-  </ng-template>
 </div>
-
-</div>
-

@@ -118,10 +118,26 @@ console.log(`${localStorage.getItem("currentUser")}`); // Clear storage)
 
   }
 
+  showingGroups = true;
+
 
   toggleGroups() {
+
     this.groupser.toggleGroups();
   }
+
+  toggleGroupView(): void {
+  this.showingGroups = !this.showingGroups;
+
+  
+ this.toggleGroups(); // Show groups
+  this.toggleSidebar();
+}
+  showSingleParticipant(): void {
+  // TODO: Replace this with logic to show a one-to-one chat or participant view
+  console.log('Showing single participant view');
+}
+
   openAiChatBot() {
     const config: MatDialogConfig = {
       width: '320px',
@@ -158,7 +174,7 @@ console.log(`${localStorage.getItem("currentUser")}`); // Clear storage)
 
     // Fetch the initial profile
     this.profileser.getProfile().subscribe();
-  
+
   }
 
   addprofile() {

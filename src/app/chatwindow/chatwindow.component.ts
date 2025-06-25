@@ -26,7 +26,7 @@ export interface Message {
   type: string; // 'sent' or 'received'
   senderName?: string; // Add optional senderName
   receiverName?: string; // Add optional receiverName
-  fileUrl?: string | null; // Optional property for file URL
+  fileUrl?: string[]; // Optional property for file URL
   audioUrl?: string | null; // Optional property for audio URL
 
   deliveryStatus?: string | null;
@@ -48,7 +48,7 @@ export class ChatwindowComponent {
   emojis: any[] = [];
   limitedEmojis: any[] = [];
   isprogress: boolean = false;
-  selectedFile: File | null = null;
+  selectedFile: File[] = [];
   isTyping: boolean = false;
   typingIndicator: string = '';
   typingTimeout: any;
@@ -80,7 +80,7 @@ export class ChatwindowComponent {
   searchQuery: string = '';
   filteredMessages: any[] = []; // This stores the filtered messages
   currentChatWithId: string | null = null;
-
+Array: any;
 
   constructor(
     private socketService: SocketService,
@@ -151,7 +151,6 @@ export class ChatwindowComponent {
     }
   }
 
-
   @HostListener('window:beforeunload', ['$event'])
   onWindowClose(event: Event): void {
     // Notify the server when the user closes the browser
@@ -159,9 +158,9 @@ export class ChatwindowComponent {
   }
 
   @HostListener('window:beforeunload', ['$event'])
-handleBeforeUnload(event: Event) {
-  this.closePreviousChat(this.currentUser._id);
-}
+  handleBeforeUnload(event: Event) {
+    this.closePreviousChat(this.currentUser._id);
+  }
   notifyActiveChat() {
     if (this.selectedUser?.userId?._id) {
       this.socketService.emit('chat:open', {
@@ -169,7 +168,7 @@ handleBeforeUnload(event: Event) {
         chatWithUserId: this.selectedUser.userId._id,
       });
 
-      console.log("chatopen")
+      console.log('chatopen');
     }
   }
 
@@ -189,6 +188,10 @@ handleBeforeUnload(event: Event) {
         message.text.toLowerCase().includes(query)
       );
     }
+  }
+
+  isString(value: any): boolean {
+    return typeof value === 'string';
   }
 
   receiveSocket(): void {
@@ -239,9 +242,14 @@ handleBeforeUnload(event: Event) {
           newMessage.sender._id === this.currentUser._id ? 'sent' : 'received',
         senderName: newMessage.sender.name,
         receiverName: newMessage.receiver?.name || 'Unknown',
-        fileUrl: newMessage.message.fileUrl
-          ? `http://localhost:3000${newMessage.message.fileUrl}`
-          : null,
+        fileUrl: Array.isArray(newMessage.message.fileUrl)
+          ? newMessage.message.fileUrl.map(
+              (url: string) => `http://localhost:3000${url}`
+            )
+          : newMessage.message.fileUrl
+          ? [`http://localhost:3000${newMessage.message.fileUrl}`]
+          : [],
+
         audioUrl: newMessage.message.audioUrl
           ? `http://localhost:3000${newMessage.message.audioUrl}`
           : null,
@@ -253,12 +261,12 @@ handleBeforeUnload(event: Event) {
       setTimeout(() => this.scrollToBottom(), 200);
 
       const isInActiveChat =
-    this.currentChatWithId === newMessage.sender._id ||
-    this.currentChatWithId === newMessage.receiver._id;
+        this.currentChatWithId === newMessage.sender._id ||
+        this.currentChatWithId === newMessage.receiver._id;
 
-  if (isInActiveChat && newMessage.sender._id !== this.currentUser._id) {
-    this.messageSeen(newMessage.message._id); // ✅ Auto mark as seen
-  }
+      if (isInActiveChat && newMessage.sender._id !== this.currentUser._id) {
+        this.messageSeen(newMessage.message._id); // ✅ Auto mark as seen
+      }
     });
     this.socketService.on('message:sent', (data) => {
       const msg = this.messages.find((m) => m._id === data.messageId);
@@ -268,7 +276,6 @@ handleBeforeUnload(event: Event) {
       }
     });
 
-
     this.socketService.on('message:seen', (data) => {
       const msg = this.messages.find((m) => m._id === data.messageId);
       if (msg) {
@@ -277,9 +284,7 @@ handleBeforeUnload(event: Event) {
         console.log('👁️ Message seen on sender side:', msg);
       }
     });
-
   }
-
 
   deleteSocket(): void {
     // Listen for delete event from the server
@@ -335,6 +340,7 @@ handleBeforeUnload(event: Event) {
     this.isprogress = true;
 
     const emojiList = [
+      // 😀 Smileys & Emotion
       '😀',
       '😁',
       '😂',
@@ -395,9 +401,240 @@ handleBeforeUnload(event: Event) {
       '🤯',
       '😳',
       '🥺',
+      '🥱',
+      '😬',
+      '🤥',
+      '😷',
+      '🤒',
+      '🤕',
+      '🤢',
+      '🤮',
+
+      // 🧠 People & Body
+      '👋',
+      '🤚',
+      '🖐',
+      '✋',
+      '🖖',
+      '👌',
+      '🤌',
+      '🤏',
+      '✌',
+      '🤞',
+      '🤟',
+      '🤘',
+      '🤙',
+      '👈',
+      '👉',
+      '👆',
+      '🖕',
+      '👇',
+      '👍',
+      '👎',
+      '✊',
+      '👊',
+      '🤛',
+      '🤜',
+      '👏',
+      '🙌',
+      '👐',
+      '🤲',
+      '🤝',
+      '🙏',
+      '✍',
+      '💅',
+      '🤳',
+      '💪',
+      '🦾',
+      '🧠',
+
+      // 🐶 Animals & Nature
+      '🐶',
+      '🐱',
+      '🐭',
+      '🐹',
+      '🐰',
+      '🦊',
+      '🐻',
+      '🐼',
+      '🐻‍❄️',
+      '🐨',
+      '🐯',
+      '🦁',
+      '🐮',
+      '🐷',
+      '🐸',
+      '🐵',
+      '🙈',
+      '🙉',
+      '🙊',
+      '🐒',
+      '🐔',
+      '🐧',
+      '🐦',
+      '🐤',
+      '🐣',
+      '🐥',
+      '🦆',
+      '🦅',
+      '🦉',
+      '🦇',
+      '🐺',
+      '🐗',
+      '🐴',
+      '🦄',
+      '🐝',
+
+      // 🍎 Food & Drink
+      '🍏',
+      '🍎',
+      '🍐',
+      '🍊',
+      '🍋',
+      '🍌',
+      '🍉',
+      '🍇',
+      '🍓',
+      '🫐',
+      '🍈',
+      '🍒',
+      '🍑',
+      '🥭',
+      '🍍',
+      '🥥',
+      '🥝',
+      '🍅',
+      '🍆',
+      '🥑',
+      '🥦',
+      '🥬',
+      '🥒',
+      '🌶',
+      '🫑',
+      '🌽',
+      '🥕',
+      '🫒',
+      '🧄',
+      '🧅',
+      '🥔',
+      '🍠',
+      '🥐',
+      '🍞',
+      '🥖',
+
+      // ⚽ Activities
+      '⚽',
+      '🏀',
+      '🏈',
+      '⚾',
+      '🎾',
+      '🏐',
+      '🏉',
+      '🥏',
+      '🎱',
+      '🪀',
+      '🏓',
+      '🏸',
+      '🥅',
+      '🏒',
+      '🏑',
+      '🥍',
+      '🏏',
+      '🪃',
+      '🥊',
+      '🥋',
+      '🎽',
+      '🛹',
+      '🛷',
+      '⛷',
+      '🏂',
+      '🪂',
+      '🏋️‍♂️',
+      '🤼‍♂️',
+      '🤸‍♀️',
+      '⛹️',
+      '🤺',
+      '🤾',
+      '🏇',
+
+      // 🛒 Objects & Symbols
+      '💌',
+      '💣',
+      '💎',
+      '📱',
+      '💻',
+      '🖥',
+      '🖨',
+      '💡',
+      '🔦',
+      '📷',
+      '📸',
+      '🎥',
+      '📺',
+      '📻',
+      '⏰',
+      '⏱',
+      '🕰',
+      '🔋',
+      '🔌',
+      '💸',
+      '💵',
+      '💳',
+      '💰',
+      '🪙',
+      '📦',
+      '📫',
+      '📮',
+      '🛒',
+      '🎁',
+      '🎈',
+      '🎉',
+      '🎊',
+      '🎂',
+      '🍰',
+      '🧁',
+
+      // ❤️ Symbols
+      '❤️',
+      '🧡',
+      '💛',
+      '💚',
+      '💙',
+      '💜',
+      '🖤',
+      '🤍',
+      '🤎',
+      '💔',
+      '❣️',
+      '💕',
+      '💞',
+      '💓',
+      '💗',
+      '💖',
+      '💘',
+      '💝',
+      '💟',
+      '🔞',
+      '🔔',
+      '🔕',
+      '🔒',
+      '🔓',
+      '🔑',
+      '🗝',
+      '🛐',
+      '⛎',
+      '♈',
+      '♉',
+      '♊',
+      '♋',
+      '♌',
+      '♍',
+      '♎',
+      '♏',
+      '♐',
     ];
 
-    this.emojis = emojiList.slice(0, 60); // Limit to 60 emojis
+    this.emojis = emojiList.slice(0, 270); // Limit to 60 emojis
     this.isprogress = false;
   }
 
@@ -408,13 +645,15 @@ handleBeforeUnload(event: Event) {
   onSelectEmoji(): void {
     this.selectemoji = !this.selectemoji;
     setTimeout(() => this.scrollToBottom(), 100); // Ensure the UI updates before scrolling
+    console.log('Emoji selected:', this.emojis);
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-      this.message = `File: ${this.selectedFile.name}`; // Show the filename in the message input
+      this.selectedFile = Array.from(input.files);
+      const fileNames = this.selectedFile.map((f) => f.name).join(', ');
+      this.message = `File: ${fileNames}`;
     }
   }
   isZipFile(fileUrl: string | null | undefined): boolean {
@@ -464,14 +703,22 @@ handleBeforeUnload(event: Event) {
             _id: message._id,
             text: message.text,
             time: new Date(message.time).toLocaleString(),
-            type: message.sender._id === this.currentUser._id ? 'sent' : 'received',
+            type:
+              message.sender._id === this.currentUser._id ? 'sent' : 'received',
             senderName: message.sender.name,
             receiverName: message.receiver?.name || 'Unknown',
-            fileUrl: message.fileUrl ? `http://localhost:3000${message.fileUrl}` : null,
-            audioUrl: message.audioUrl ? `http://localhost:3000${message.audioUrl}` : null,
+            // ✅ Updated to support multiple files
+            fileUrl: Array.isArray(message.fileUrl)
+              ? message.fileUrl.map((url: any) => `http://localhost:3000${url}`)
+              : [],
+            audioUrl: message.audioUrl
+              ? `http://localhost:3000${message.audioUrl}`
+              : null,
             deliveryStatus: message.deliveryStatus,
           }))
-          .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+          .sort(
+            (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
+          );
 
         console.log('✅ Fetched messages:', this.messages);
 
@@ -496,9 +743,12 @@ handleBeforeUnload(event: Event) {
     );
   }
 
-
   messageSeen(messageId: string): void {
-    if (!messageId || !this.currentUser?._id || !this.selectedUser?.userId?._id) {
+    if (
+      !messageId ||
+      !this.currentUser?._id ||
+      !this.selectedUser?.userId?._id
+    ) {
       return;
     }
 
@@ -510,8 +760,6 @@ handleBeforeUnload(event: Event) {
 
     console.log('👁️ Emitted message:seen for', messageId);
   }
-
-
 
   // Fetch chat users when opening the forward modal
   // Open Forward Modal with Chat Users
@@ -531,9 +779,18 @@ handleBeforeUnload(event: Event) {
   }
 
   sendMessage(): void {
+
+     const maxSize = 10 * 1024 * 1024;
+  const oversizedFile = this.selectedFile.find(file => file.size > maxSize);
+  if (oversizedFile) {
+    this.showErrorSnackbar(
+      `File "${oversizedFile.name}" exceeds the 10MB limit.`
+    );
+    return;
+  }
     if (
       this.message.trim() ||
-      this.selectedFile ||
+      this.selectedFile.length > 0 ||
       (this.audioUrl && this.audioChunks.length > 0)
     ) {
       const formData = new FormData();
@@ -543,9 +800,17 @@ handleBeforeUnload(event: Event) {
         this.message.trim() || (this.audioUrl ? 'Audio message' : '')
       );
 
-      if (this.selectedFile) {
-        formData.append('file', this.selectedFile);
-      } else if (this.audioUrl && this.audioChunks.length > 0) {
+      // Append all selected files
+      this.selectedFile.forEach((file) => {
+        formData.append('file', file);
+      });
+
+      // Audio message
+      if (
+        !this.selectedFile.length &&
+        this.audioUrl &&
+        this.audioChunks.length > 0
+      ) {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
         const audioFile = new File([audioBlob], 'recording.wav', {
           type: 'audio/wav',
@@ -558,7 +823,7 @@ handleBeforeUnload(event: Event) {
         fromUserId: this.currentUser._id,
       });
 
-      this.isTyping = false; // Reset typing state
+      this.isTyping = false;
 
       this.authser.sendMessage(formData).subscribe({
         next: (response) => {
@@ -566,16 +831,17 @@ handleBeforeUnload(event: Event) {
             _id: response.message?._id,
             text: this.message.trim() || '',
             type: 'sent',
-            time: new Date().toISOString(),
-            fileUrl: response?.message.fileUrl
-              ? `http://localhost:3000${response?.message.fileUrl}`
-              : null,
+            time: new Date().toLocaleString(),
+            fileUrl:
+              response?.message.fileUrl?.map(
+                (f: any) => `http://localhost:3000${f}`
+              ) || null,
             audioUrl: response?.message.audioUrl
               ? `http://localhost:3000${response?.message.audioUrl}`
               : null,
             senderName: this.currentUser.name,
             receiverName: this.selectedUser.name,
-            deliveryStatus: response.message?.deliveryStatus, // Initially mark as sent
+            deliveryStatus: response.message?.deliveryStatus,
           };
 
           this.playSound('/assets/message-124468.mp3');
@@ -589,7 +855,8 @@ handleBeforeUnload(event: Event) {
           });
 
           this.clearInputs();
-          if (this.audioUrl) this.clearAudioRecording(); // Clear recording if audio message
+          if (this.audioUrl) this.clearAudioRecording();
+          this.selectemoji = false;
         },
         error: (err: HttpErrorResponse) => {
           console.error('Failed to send message:', err);
@@ -600,6 +867,19 @@ handleBeforeUnload(event: Event) {
       });
     }
   }
+
+
+  getFileType(fileUrl: string): string {
+  const extension = fileUrl.split('.').pop()?.toLowerCase();
+  if (!extension) return 'other';
+  if (['jpg', 'jpeg', 'png', 'gif', 'avif'].includes(extension)) return 'image';
+  if (['mp4', 'webm'].includes(extension)) return 'video';
+  if (extension === 'pdf') return 'pdf';
+  if (['doc', 'docx'].includes(extension)) return 'doc';
+  if (['zip', 'rar'].includes(extension)) return 'zip';
+  return 'other';
+}
+
 
   // Show Snackbar for error messages
   private showErrorSnackbar(message: string): void {
@@ -776,12 +1056,13 @@ handleBeforeUnload(event: Event) {
     this.audioUrl = null;
     this.audioChunks = [];
     this.isRecording = false;
+    this.cdr.detectChanges(); // Trigger change detection
   }
 
   // Utility method to clear input fields after sending a message
   private clearInputs(): void {
     this.message = '';
-    this.selectedFile = null;
+    this.selectedFile = [];
     this.scrollToBottom(); // Scroll to the latest message
   }
 
@@ -816,7 +1097,6 @@ handleBeforeUnload(event: Event) {
       console.log('result', result);
     });
   }
-
 
   blockUser(userId: string) {
     if (!userId) return;
@@ -902,7 +1182,6 @@ handleBeforeUnload(event: Event) {
     });
   }
 
-
   // openVideos() {
   //   this.dialog.open(VideocallComponent, {
   //     width: '80vw',
@@ -918,16 +1197,8 @@ handleBeforeUnload(event: Event) {
     window.open('/videocall', '_blank');
   }
 
-
-
-
-
-refreshData() {
-  // Example: refresh data, trigger socket, reload UI, etc.
-  this.cdr.detectChanges();
-}
-
-
-
-
+  refreshData() {
+    // Example: refresh data, trigger socket, reload UI, etc.
+    this.cdr.detectChanges();
+  }
 }

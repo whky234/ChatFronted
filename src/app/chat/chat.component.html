@@ -7,33 +7,19 @@
       SwiftChatPro
     </div>
 
-    <!-- Hamburger Menu (visible on small screens) -->
-    <button mat-icon-button class="hamburger-menu" (click)="toggleMobileMenu()">
-      <mat-icon>menu</mat-icon>
-    </button>
 
-    <!-- Center: Navigation Icons (hidden on small screens if menu toggled) -->
-    <div class="nav-icons desktop-only" [class.show-mobile-menu]="mobileMenuOpen">
-      <button mat-icon-button (click)="logout()" title="Exit Group"><mat-icon>exit_to_app</mat-icon></button>
-      <button mat-icon-button (click)="toggleGroups()" title="Show Groups"><mat-icon>group</mat-icon></button>
-      <button mat-icon-button (click)="openNotificationDialog()" title="Notifications">
-        <mat-icon>notifications</mat-icon>
-        <span *ngIf="personalCount + groupCount > 0" class="notification-badge">{{ personalCount + groupCount }}</span>
-      </button>
-      <button mat-icon-button (click)="openprofileList()" title="Create Profile"><mat-icon>person</mat-icon></button>
-      <button mat-icon-button (click)="openAiChatBot()" title="AI Chatbot"><mat-icon>smart_toy</mat-icon></button>
-      <button mat-icon-button (click)="openSettingsDialog()" title="Settings"><mat-icon>settings</mat-icon></button>
-      <button mat-icon-button (click)="scheduleMeeting()" title="Schedule Meeting"><mat-icon>calendar_today</mat-icon></button>
-      <button mat-icon-button (click)="openVideos()" title="Call Room"><mat-icon>videocam</mat-icon></button>
-    </div>
 
     <!-- Right: User Info -->
-    <div class="user-info" (click)="viewprofileList()">
+
+    <div class="user-info" >
+       <button mat-icon-button (click)="openNotificationDialog()"  matTooltip="Notifications">
+          <mat-icon>notifications</mat-icon>
+          <span *ngIf="personalCount + groupCount > 0" class="notification-badge">{{ personalCount + groupCount }}</span>
+        </button>
       <span class="user-name">{{ currentUser?.name }}</span>
-      <button mat-icon-button><mat-icon>account_circle</mat-icon></button>
+      <button mat-icon-button (click)="viewprofileList()"  matTooltip="View Profile"><mat-icon>account_circle</mat-icon></button>
     </div>
   </mat-toolbar>
-
 
   <!-- Main Body -->
   <div class="main-content">
@@ -41,6 +27,46 @@
     <div class="sidebar">
       <app-userlist (userSelected)="onUserSelected($event)" (groupSelected)="onGroupSelected($event)"></app-userlist>
     </div>
+
+    <!-- Navigation Sidebar -->
+    <button mat-icon-button class="open-sidebar-button" (click)="toggleSidebar()" matTooltip="open sidebar">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <div class="nav-sidebar" [class.open]="isSidebarOpen">
+  <div class="nav-icons" style="flex-direction: column; margin-top: 50px;">
+    <button mat-icon-button (click)="logout(); toggleSidebar()" matTooltip="Exit Group">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+
+   <button mat-icon-button (click)="toggleGroupView()"
+        [matTooltip]="showingGroups ? 'Show Groups' : 'Show Single Participant'">
+<mat-icon>{{ showingGroups ? 'group' : 'person' }}</mat-icon>
+</button>
+
+
+    <button mat-icon-button (click)="openprofileList(); toggleSidebar()" matTooltip="Create Profile">
+      <mat-icon>person</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="openAiChatBot(); toggleSidebar()" matTooltip="AI Chatbot">
+      <mat-icon>smart_toy</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="openSettingsDialog(); toggleSidebar()" matTooltip="Settings">
+      <mat-icon>settings</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="scheduleMeeting(); toggleSidebar()" matTooltip="Schedule Meeting">
+      <mat-icon>calendar_today</mat-icon>
+    </button>
+
+    <button mat-icon-button (click)="openVideos(); toggleSidebar()" matTooltip="Call Room">
+      <mat-icon>videocam</mat-icon>
+    </button>
+  </div>
+</div>
+
 
     <!-- Chat Section -->
     <div class="chat-section">

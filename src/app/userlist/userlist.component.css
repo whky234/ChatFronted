@@ -205,8 +205,8 @@
     max-width: 100%;
     border-radius: 0;
     border: none;
-    max-height: 100vh;
-    overflow-y: visible;
+    max-height: 70vh;
+    overflow-y: auto;
   }
 
   .participant-header {
@@ -227,42 +227,10 @@
     font-size: 0.8rem; /* Smaller font size for buttons */
     padding: 3px 8px;
   }
-
-  .participant-item {
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  .participant-item img {
-    flex-shrink: 0;
-  }
-
-  .participant-item span {
-    display: inline-block;
-    margin-left: 10px;
-  }
-
-  .participant-header {
-    flex-wrap: wrap;
-  }
-
-  .participant-header .actions {
-    margin-top: 10px;
-    width: 100%;
-    text-align: center;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .participant-list {
-    max-height: 100vh;
-    overflow-y: auto;
-  }
 }
 
 @media screen and (max-width: 480px ) {
-  .participant-list {
-    max-height: 100vh;
+  .participant-list{
     overflow-y: auto;
   }
   .participant-item img {
@@ -328,7 +296,7 @@ i {
 .group-item {
   display: flex;
   justify-content: space-between;
-  /* align-items: center; */
+  align-items: center;
   background-color: white;
   padding: 10px;
   border-radius: 6px;
@@ -380,4 +348,7 @@ mat-dialog-actions {
 }
 
 
+/* Mobile-friendly Group Items */
+@media screen and (max-width: 480px) {
 
+}

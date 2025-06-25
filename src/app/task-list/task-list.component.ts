@@ -176,6 +176,9 @@ export class TaskListComponent {
       return;
     }
 
+    console.log('Task:', task);
+    console.log('New Status:', newStatus);
+
     if (
       task.status === 'in-review' &&
       newStatus !== 'completed' &&

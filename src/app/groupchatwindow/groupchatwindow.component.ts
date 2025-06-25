@@ -85,6 +85,7 @@ export class GroupchatwindowComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeChat();
     this.fetchUsers();
+    this.getEmoji()
     console.log('name', this.currentUser._id);
 
     if (this.group && this.currentUser) {
@@ -216,92 +217,126 @@ export class GroupchatwindowComponent implements OnInit, OnDestroy {
    * Fetch group messages from the service.
    */
   loadMessages(): void {
-    if (!this.group || !this.group._id) {
-      console.warn('No group selected.');
-      return;
-    }
-
-    this.messages = []; // ✅ Clear messages before fetching new ones
-    this.groupserService.getGroupMessages(this.group._id).subscribe({
-      next: (messages) => {
-        const BASE_URL = 'http://localhost:3000'; // Ensure trailing slash
-
-        this.messages = messages.map((message: any) => ({
-          ...message,
-          type:
-            message.sender._id === this.currentUser._id ? 'sent' : 'received',
-          receiverNames: message.receivers.map((r: any) => r.name).join(', '),
-
-          // ✅ Construct file URLs correctly
-          fileUrl: message.fileUrl ? `${BASE_URL}${message.fileUrl}` : null,
-          audioUrl: message.audioUrl ? `${BASE_URL}${message.audioUrl}` : null,
-          seenBy: message.seenBy || [], // ✅ Include seenBy array
-        }));
-      },
-      error: (err) => {
-        console.error('Failed to edit message:', err);
-        this.snackBar.open(
-          err?.error?.message || 'Failed to block user.',
-          'Close',
-          {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          }
-        );
-      },    });
+  if (!this.group || !this.group._id) {
+    console.warn('No group selected.');
+    return;
   }
+
+  this.messages = []; // ✅ Clear messages before fetching new ones
+
+  this.groupserService.getGroupMessages(this.group._id).subscribe({
+    next: (messages) => {
+      const BASE_URL = 'http://localhost:3000';
+
+      this.messages = messages.map((message: any) => {
+        let fileUrls = null;
+
+        if (Array.isArray(message.fileUrl)) {
+          fileUrls = message.fileUrl.map((f: string) => `${BASE_URL}${f}`);
+        } else if (typeof message.fileUrl === 'string') {
+          fileUrls = [`${BASE_URL}${message.fileUrl}`];
+        }
+
+        return {
+          ...message,
+          type: message.sender._id === this.currentUser._id ? 'sent' : 'received',
+          receiverNames: message.receivers?.map((r: any) => r.name).join(', ') || '',
+          fileUrl: fileUrls,
+          audioUrl: message.audioUrl ? `${BASE_URL}${message.audioUrl}` : null,
+          seenBy: message.seenBy || [],
+        };
+      });
+
+      setTimeout(() => this.scrollToBottom(), 200);
+    },
+    error: (err) => {
+      console.error('Failed to load messages:', err);
+      this.snackBar.open(
+        err?.error?.message || 'Failed to load messages.',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        }
+      );
+    },
+  });
+}
+
+
+getFileType(fileUrl: string): string {
+  const extension = fileUrl.split('.').pop()?.toLowerCase();
+  if (!extension) return 'other';
+  if (['jpg', 'jpeg', 'png', 'gif', 'avif'].includes(extension)) return 'image';
+  if (['mp4', 'webm'].includes(extension)) return 'video';
+  if (extension === 'pdf') return 'pdf';
+  if (['doc', 'docx'].includes(extension)) return 'doc';
+  if (['zip', 'rar'].includes(extension)) return 'zip';
+  return 'other';
+}
+
 
   /**
    * Poll for new messages from the current group only.
    */
   startMessagePolling(): void {
-    if (this.messagePollingInterval) {
-      clearInterval(this.messagePollingInterval); // ✅ Stop polling when switching groups
-    }
-
-    this.messagePollingInterval = setInterval(() => {
-      if (!this.group || !this.group._id) return;
-
-      this.groupserService.getGroupMessages(this.group._id).subscribe({
-        next: (newMessages) => {
-          const BASE_URL = 'http://localhost:3000';
-
-          const lastMessageTime = this.messages.length
-            ? new Date(this.messages[this.messages.length - 1].time).getTime()
-            : 0;
-
-          const filteredMessages = newMessages
-            .filter(
-              (msg: any) => new Date(msg.time).getTime() > lastMessageTime
-            )
-            .map((msg: any) => ({
-              ...msg,
-              type:
-                msg.sender._id === this.currentUser._id ? 'sent' : 'received',
-              fileUrl: msg.fileUrl ? `${BASE_URL}${msg.fileUrl}` : null,
-              audioUrl: msg.audioUrl ? `${BASE_URL}${msg.audioUrl}` : null,
-              seenBy: msg.seenBy || [], // ✅ Ensure seenBy updates
-            }));
-
-          if (filteredMessages.length > 0) {
-            this.messages.push(...filteredMessages);
-          }
-        },
-        error: (err) => {
-          console.error('Failed to get message:', err);
-          this.snackBar.open(
-            err?.error?.message || 'Failed to block user.',
-            'Close',
-            {
-              duration: 3000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top'
-            }
-          );
-        },      });
-    }, 1000); // ✅ Polling every 5 seconds
+  if (this.messagePollingInterval) {
+    clearInterval(this.messagePollingInterval); // ✅ Stop polling when switching groups
   }
+
+  this.messagePollingInterval = setInterval(() => {
+    if (!this.group || !this.group._id) return;
+
+    this.groupserService.getGroupMessages(this.group._id).subscribe({
+      next: (newMessages) => {
+        const BASE_URL = 'http://localhost:3000';
+
+        const lastMessageTime = this.messages.length
+          ? new Date(this.messages[this.messages.length - 1].time).getTime()
+          : 0;
+
+        const filteredMessages = newMessages
+          .filter(
+            (msg: any) => new Date(msg.time).getTime() > lastMessageTime
+          )
+          .map((msg: any) => {
+            let fileUrls = null;
+
+            if (Array.isArray(msg.fileUrl)) {
+              fileUrls = msg.fileUrl.map((f: string) => `${BASE_URL}${f}`);
+            } else if (typeof msg.fileUrl === 'string') {
+              fileUrls = [`${BASE_URL}${msg.fileUrl}`];
+            }
+
+            return {
+              ...msg,
+              type: msg.sender._id === this.currentUser._id ? 'sent' : 'received',
+              fileUrl: fileUrls,
+              audioUrl: msg.audioUrl ? `${BASE_URL}${msg.audioUrl}` : null,
+              seenBy: msg.seenBy || [],
+            };
+          });
+
+        if (filteredMessages.length > 0) {
+          this.messages.push(...filteredMessages);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to get message:', err);
+        this.snackBar.open(
+          err?.error?.message || 'Failed to get message.',
+          'Close',
+          {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          }
+        );
+      },
+    });
+  }, 1000); // Polling every second
+}
 
   listenForMessages(): void {
     this.socketService.onNewMessage().subscribe((message: any) => {
@@ -350,6 +385,8 @@ export class GroupchatwindowComponent implements OnInit, OnDestroy {
           //   message: message.text
           // });
         }
+      setTimeout(() => this.scrollToBottom(), 200);
+          this.selectemoji= false; // Close emoji picker
 
         this.messageText = ''; // ✅ Clear input field
       },
@@ -380,76 +417,90 @@ scrollToBottom(): void {
   /**
    * Handle file upload and send as a message.
    */
-  handleFileUpload(event: any): void {
-    const file = event.target.files[0];
+ handleFileUpload(event: any): void {
+  const files: FileList = event.target.files;
 
-    if (!file) return;
+  if (!files || files.length === 0) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('groupId', this.group._id);
-    formData.append('senderId', this.currentUser._id);
+  const formData = new FormData();
+  formData.append('groupId', this.group._id);
+  formData.append('senderId', this.currentUser._id);
 
-    // Check if the file type is valid before sending
-    const allowedTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/avif',
-      'application/pdf',
-      'application/msword', // .doc
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-      'application/zip', // ZIP file
-      'application/x-zip-compressed', // Alternative ZIP MIME type
-      'multipart/x-zip', // Alternative ZIP MIME type
-      'application/x-compressed', // Alternative ZIP MIME type    'audio/mpeg', // .mp3
-      'audio/wav',
-      'audio/ogg',
-      'video/mp4',
-    ];
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/avif',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/zip',
+    'application/x-zip-compressed',
+    'multipart/x-zip',
+    'application/x-compressed',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'video/mp4',
+  ];
 
-    if (!allowedTypes.includes(file.type)) {
-      this.showErrorSnackbar('Invalid file type. Please select a valid file.');
-      return;
+  // Append valid files
+  const invalidFiles: string[] = [];
+
+  Array.from(files).forEach((file: File) => {
+    if (allowedTypes.includes(file.type)) {
+      formData.append('file', file); // Multiple files with same key
+    } else {
+      invalidFiles.push(file.name);
     }
+  });
 
-    this.groupserService.sendMessageToGroup(formData).subscribe({
-      next: (response) => {
-        console.log('File sent:', response);
-
-        if (response?.message) {
-          const BASE_URL = 'http://localhost:3000';
-
-          const fileMessage = response.message;
-          fileMessage.type =
-            fileMessage.sender._id === this.currentUser._id
-              ? 'sent'
-              : 'received';
-
-          // ✅ Attach file URL if it's a valid file message
-          if (fileMessage.fileUrl) {
-            fileMessage.fileUrl = `${BASE_URL}${fileMessage.fileUrl}`;
-          }
-          if (fileMessage.audioName) {
-            fileMessage.audioUrl = `${BASE_URL}${fileMessage.fileUrl}`;
-          }
-
-          this.messages.push(fileMessage);
-        }
-      },
-      error: (err) => {
-        console.error('Failed to edit message:', err);
-        this.snackBar.open(
-          err?.error?.message || 'Failed to block user.',
-          'Close',
-          {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          }
-        );
-      },
-    });
+  if (invalidFiles.length > 0) {
+    this.showErrorSnackbar(`Invalid file(s): ${invalidFiles.join(', ')}`);
+    return;
   }
+
+  this.groupserService.sendMessageToGroup(formData).subscribe({
+    next: (response) => {
+      console.log('Files sent:', response);
+
+      if (response?.message) {
+        const BASE_URL = 'http://localhost:3000';
+        const fileMessage = response.message;
+        fileMessage.type =
+          fileMessage.sender._id === this.currentUser._id
+            ? 'sent'
+            : 'received';
+
+        // Ensure fileUrl is handled as an array (for multiple files)
+        if (Array.isArray(fileMessage.fileUrl)) {
+          fileMessage.fileUrl = fileMessage.fileUrl.map((f: string) => `${BASE_URL}${f}`);
+        } else if (fileMessage.fileUrl) {
+          fileMessage.fileUrl = [`${BASE_URL}${fileMessage.fileUrl}`];
+        }
+
+        if (fileMessage.audioUrl) {
+          fileMessage.audioUrl = `${BASE_URL}${fileMessage.audioUrl}`;
+        }
+
+        this.messages.push(fileMessage);
+        setTimeout(() => this.scrollToBottom(), 200);
+      }
+    },
+    error: (err) => {
+      console.error('Failed to upload files:', err);
+      this.snackBar.open(
+        err?.error?.message || 'Failed to send files.',
+        'Close',
+        {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+        }
+      );
+    },
+  });
+}
+
 
   // ✅ Show error messages in a Snackbar
   private showErrorSnackbar(message: string): void {
@@ -563,30 +614,51 @@ scrollToBottom(): void {
     this.isprogress = true;
 
     const emojiList = [
-      '😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆', '😉', '😊',
-      '😋', '😎', '😍', '😘', '😗', '😙', '😚', '🙂', '🤗', '🤩',
-      '🤔', '🤨', '😐', '😑', '😶', '🙄', '😏', '😣', '😥', '😮',
-      '🤐', '😯', '😪', '😫', '😴', '😌', '😛', '😜', '😝', '🤤',
-      '😒', '😓', '😔', '😕', '🙃', '🤑', '😲', '☹', '😖', '😞',
-      '😟', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥺'
-    ];
+  // 😀 Smileys & Emotion
+  '😀','😁','😂','🤣','😃','😄','😅','😆','😉','😊','😋','😎','😍','😘','😗','😙','😚',
+  '🙂','🤗','🤩','🤔','🤨','😐','😑','😶','🙄','😏','😣','😥','😮','🤐','😯','😪','😫',
+  '😴','😌','😛','😜','😝','🤤','😒','😓','😔','😕','🙃','🤑','😲','☹','😖','😞','😟',
+  '😢','😭','😤','😠','😡','🤬','🤯','😳','🥺','🥱','😬','🤥','😷','🤒','🤕','🤢','🤮',
 
-    this.emojis = emojiList.slice(0, 60); // Limit to 60 emojis
+  // 🧠 People & Body
+  '👋','🤚','🖐','✋','🖖','👌','🤌','🤏','✌','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇',
+  '👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍','💅','🤳','💪','🦾','🧠',
+
+  // 🐶 Animals & Nature
+  '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈',
+  '🙉','🙊','🐒','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝',
+
+  // 🍎 Food & Drink
+  '🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝',
+  '🍅','🍆','🥑','🥦','🥬','🥒','🌶','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🍞','🥖',
+
+  // ⚽ Activities
+  '⚽','🏀','🏈','⚾','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪃',
+  '🥊','🥋','🎽','🛹','🛷','⛷','🏂','🪂','🏋️‍♂️','🤼‍♂️','🤸‍♀️','⛹️','🤺','🤾','🏇',
+
+  // 🛒 Objects & Symbols
+  '💌','💣','💎','📱','💻','🖥','🖨','💡','🔦','📷','📸','🎥','📺','📻','⏰','⏱','🕰','🔋',
+  '🔌','💸','💵','💳','💰','🪙','📦','📫','📮','🛒','🎁','🎈','🎉','🎊','🎂','🍰','🧁',
+
+  // ❤️ Symbols
+  '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝',
+  '💟','🔞','🔔','🔕','🔒','🔓','🔑','🗝','🛐','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐',
+];
+
+
+    this.emojis = emojiList.slice(0, 270); // Limit to 60 emojis
     this.isprogress = false;
   }
-
-
-
-
 
   appendEmoji(emoji: string): void {
     this.message += emoji;
   }
 
-    onSelectEmoji(): void {
-      this.selectemoji = !this.selectemoji;
-      setTimeout(() => this.scrollToBottom(), 100); // Ensure the UI updates before scrolling
-    }
+  onSelectEmoji(): void {
+    this.selectemoji = !this.selectemoji;
+    setTimeout(() => this.scrollToBottom(), 100); // Ensure the UI updates before scrolling
+    console.log('Selected emoji:', this.emojis);
+  }
 
   onTyping() {
     if (!this.isTyping) {
@@ -763,36 +835,52 @@ scrollToBottom(): void {
   }
 
   openAddMembersDialog() {
-    this.fetchUsers();
-    setTimeout(() => {
-      console.log('Available users:', this.availableUsers);
+  this.fetchUsers();
 
-      const dialogRef = this.Dialog.open(AddmembersComponent, {
-        width: '400px',
-        data: { groupId: this.group._id, users: this.availableUsers },
-      });
+  setTimeout(() => {
+    console.log('Available users:', this.availableUsers);
 
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result && result.length > 0) {
-          console.log('Members added:', result);
+    const dialogRef = this.Dialog.open(AddmembersComponent, {
+      width: '400px',
+      data: { groupId: this.group._id, users: this.availableUsers },
+    });
 
-          this.groupserService.addMembers(this.group._id, result).subscribe({
-            next: (res) => {
-              console.log('Members successfully added:', res);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.length > 0) {
+        console.log('Members added:', result);
 
-              // ✅ Emit socket event after successfully adding members
-              this.socketService.emit('group:addMembers', {
-                groupId: this.group._id,
-                newMembers: result,
-                adminId: this.currentUser._id,
-              });
-            },
-            error: (err) => console.error('Error adding members:', err),
-          });
-        }
-      });
-    }, 500);
-  }
+        this.groupserService.addMembers(this.group._id, result).subscribe({
+          next: (res) => {
+            console.log('Members successfully added:', res);
+
+            this.snackBar.open(res.message, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-success'],
+            });
+
+            this.socketService.emit('group:addMembers', {
+              groupId: this.group._id,
+              newMembers: result,
+              adminId: this.currentUser._id,
+            });
+          },
+          error: (err: { error: { message: string; }; }) => {
+            console.error('Error adding members:', err);
+
+            this.snackBar.open(err.error.message, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-error'],
+            });
+          },
+        });
+      }
+    });
+  }, 500);
+}
 
   startRecording(): void {
     navigator.mediaDevices
@@ -850,7 +938,7 @@ scrollToBottom(): void {
 
             const audioMessage = response.message;
             audioMessage.type =
-              audioMessage.sender._id === this.currentUser.id
+              audioMessage.sender._id === this.currentUser._id
                 ? 'sent'
                 : 'received';
 

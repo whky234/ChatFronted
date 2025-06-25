@@ -9,7 +9,7 @@
         class="group-image"
       />
 
-      <span class="participant-name">{{ group.name }}</span
+      <span class="participant-name"  matTooltip="View Detail">{{ group.name }}</span
       ><br />
     </div>
      <!-- Search Input -->
@@ -48,19 +48,14 @@
           <mat-icon>list</mat-icon>
           <span>Task View</span>
         </button>
-        <button
-          *ngIf="group.admin?._id === currentUser._id"
-          mat-menu-item
-          (click)="openAddMembersDialog()"
-        >
+
+           <button mat-menu-item (click)="openAddMembersDialog()">
           <mat-icon>person_add</mat-icon>
           <span>Add Members</span>
         </button>
 
-        <button mat-menu-item (click)="leaveGroup(group._id)">
-          <mat-icon>person_add</mat-icon>
-          <span>Leave group</span>
-        </button>
+
+
       </mat-menu>
     </div>
   </div>
@@ -109,7 +104,7 @@
       </span> -->
 
       <!-- File or Image Preview -->
-      <div *ngIf="message.fileUrl">
+      <!-- <div *ngIf="message.fileUrl">
         <ng-container
           *ngIf="
             message.fileUrl.endsWith('.jpg') ||
@@ -134,7 +129,7 @@
         </ng-template>
       </div>
 
-      <!-- Video Preview -->
+
       <div
         class="video-preview"
         *ngIf="message.fileUrl && message.fileUrl.endsWith('.mp4')"
@@ -143,41 +138,47 @@
           <source [src]="message.fileUrl" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-      </div>
+      </div> -->
+
+       <div *ngIf="message.fileUrl">
+          <ng-container>
+            <div *ngFor="let file of message.fileUrl">
+              <ng-container [ngSwitch]="getFileType(file)">
+                 <a [href]="file" download>
+                <img
+                  *ngSwitchCase="'image'"
+                  [src]="file"
+                  class="image-preview"
+                />
+                </a>
+                <video
+                  *ngSwitchCase="'video'"
+                  class="video-preview"
+                  width="300"
+                  controls
+                >
+                  <source [src]="file" type="video/mp4" />
+                </video>
+                <a *ngSwitchCase="'pdf'" [href]="file" download>Download PDF</a>
+                <a *ngSwitchCase="'doc'" [href]="file" download
+                  >Download Word Document</a
+                >
+                <a *ngSwitchCase="'zip'" [href]="file" download>Download ZIP</a>
+                <a *ngSwitchDefault [href]="file" download>Download File</a>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
 
       <!-- Audio Preview -->
-      <div class="audio-preview" *ngIf="message.audioUrl">
+      <div class="audio" *ngIf="message.audioUrl">
         <audio controls>
           <source [src]="message.audioUrl" type="audio/wav" />
           Your browser does not support the audio element.
         </audio>
       </div>
 
-      <div *ngIf="message.fileUrl && message.fileUrl.endsWith('.pdf')">
-        <a [href]="message.fileUrl" target="_blank" download>
-          Download PDF Document
-        </a>
-      </div>
 
-      <!-- Word Document Preview (Only Download) -->
-      <div
-        *ngIf="
-          message.fileUrl &&
-          (message.fileUrl.endsWith('.doc') ||
-            message.fileUrl.endsWith('.docx'))
-        "
-      >
-        <a [href]="message.fileUrl" target="_blank" download>
-          Download Word Document
-        </a>
-      </div>
-
-      <!-- ZIP File Download -->
-      <div *ngIf="isZipFile(message.fileUrl)">
-        <a [href]="message.fileUrl" target="_blank" download>
-          Download ZIP File
-        </a>
-      </div>
 
       <!-- Three-dot menu for options -->
       <div class="message-options">
@@ -219,7 +220,6 @@
       </div>
 
       <!-- ✅ Edit Message Input -->
-      <!-- ✅ Edit Message Input -->
       <div
         *ngIf="editingMessage && editingMessage._id === message._id"
         class="edit-message-container"
@@ -248,7 +248,12 @@
           </button>
         </div>
       </div>
+
+
+
     </div>
+
+
   </div>
   <div *ngIf="searchQuery!">
     <div
@@ -316,7 +321,7 @@
       </div>
 
       <!-- Audio Preview -->
-      <div class="audio-preview" *ngIf="message.audioUrl">
+      <div class="audio" *ngIf="message.audioUrl">
         <audio controls>
           <source [src]="message.audioUrl" type="audio/wav" />
           Your browser does not support the audio element.
@@ -447,6 +452,7 @@
       type="file"
       accept="image/*,video/*"
       hidden
+      multiple
       (change)="handleFileUpload($event)"
     />
     <button mat-icon-button class="file-btn" (click)="fileInput.click()">

@@ -280,16 +280,15 @@ body {
   animation: typing-bounce 1.2s infinite ease-in-out;
 }
 
-/* Emoji Grid */
 .emoji-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  padding: 10px;
+  padding: 60px;
   background-color: #fff;
   border-top: 1px solid #ddd;
+  overflow: auto;
 }
-
 @keyframes typing-bounce {
   0%, 100% { transform: scale(0.8); opacity: 0.5; }
   50% { transform: scale(1); opacity: 1; }

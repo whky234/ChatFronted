@@ -1,9 +1,12 @@
+import { Message } from './../chatwindow/chatwindow.component';
 import { SocketService } from './../services/socket.service';
-import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, NgZone } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GroupsocketService } from '../services/groupsocket.service';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { GroupserService } from '../services/groupser.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-viewgroupdetail',
@@ -19,7 +22,10 @@ export class ViewgroupdetailComponent {
     @Inject(MAT_DIALOG_DATA) public data: { groupId: string, admin: string,adminId:string, groupMembers: any[] },
     private groupsocket:GroupsocketService,
     private cdRef:ChangeDetectorRef,
-    private authser:AuthService
+    private authser:AuthService,
+    private zone: NgZone,
+    private groupser:GroupserService,
+    private snackbar:MatSnackBar
   ) {
     this.groupMembers$.next(data.groupMembers || []);
 
@@ -67,15 +73,18 @@ export class ViewgroupdetailComponent {
       }
     });
 
-    // Listen for group updates
     this.groupsocket.listen('group:update').subscribe((data: any) => {
-      if (data?.groupId === this.data.groupId) {
-        this.groupMembers$.next([...data.updatedMembers]);
-        if (data.admin) {
-          this.data.admin = data.admin;
+      this.zone.run(() => {
+        console.log("📩 ✅ Socket Event Received:", data);
+
+        if (data?.groupId === this.data.groupId) {
+          this.groupMembers$.next([...data.updatedMembers]);
+          if (data.admin) {
+            this.data.admin = data.admin;
+          }
+          this.cdRef.detectChanges();
         }
-        this.cdRef.detectChanges();
-      }
+      });
     });
 
     this.groupsocket.listen('group:created').subscribe((newGroup: any) => {
@@ -105,4 +114,22 @@ export class ViewgroupdetailComponent {
   filteredMembers() {
     return this.groupMembers$.value.filter(member => member._id !== this.data.adminId);
   }
+
+  RemoveParticipant(groupId: string, memberId: string) {
+  this.groupser.removeMemberFromGroup(groupId, memberId).subscribe({
+    next: (res) => {
+      console.log("✅ Member removed successfully:", res);
+      this.snackbar.open(res.message, 'Close', { duration: 3000 });
+
+      // Optimistically update the members list
+      const updatedMembers = this.groupMembers$.value.filter(member => member._id !== memberId);
+      this.groupMembers$.next(updatedMembers);
+      this.cdRef.detectChanges();  // Ensure UI reflects the change
+    },
+    error: (err) => {
+      this.snackbar.open(`Error: ${err.error?.message || 'Could not remove member'}`, 'Close', { duration: 3000 });
+    }
+  });
+}
+
 }

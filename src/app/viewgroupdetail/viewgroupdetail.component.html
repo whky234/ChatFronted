@@ -12,6 +12,7 @@
     </p>
   </div>
 
+
   <div *ngIf="(groupMembers$ | async) as members; else loading">
     <div *ngIf="members?.length">
       <h5 class="d-flex align-items-center gap-2 text-danger border-bottom pb-1 mb-3">
@@ -22,6 +23,19 @@
         <li class="list-group-item d-flex align-items-center" *ngFor="let member of members">
           <mat-icon color="primary" class="me-2">person</mat-icon>
           <span class="fw-medium">{{ member?.name }}</span>
+                    <span class="fw-medium">{{ member?._id }}</span>
+          <!-- Inside ngFor loop for group members -->
+<button
+  mat-stroked-button
+  color="warn"
+  class="ms-auto btn-sm d-flex align-items-center gap-1"
+  *ngIf="data.adminId === currentuser"
+  (click)="RemoveParticipant(data.groupId, member._id)">
+  <mat-icon>person_remove</mat-icon>
+  Remove
+</button>
+
+
         </li>
       </ul>
     </div>

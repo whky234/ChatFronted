@@ -13,22 +13,31 @@
 
   <!-- In-call controls -->
   <div *ngIf="isInRoom" class="controls-bar">
-    <div class="room-id-display">
-      Room ID: <strong>{{ roomId }}</strong>
-    </div>
-    <button (click)="endCall()">❌ End Call</button>
+    <div class="room-id-display" *ngIf="isHost">
+  Room ID: <strong>{{ roomId }}</strong>
+  <button (click)="copyRoomId()">Copy</button>
+</div>
+
+    <button (click)="endCall()" [disabled]="!isHost">❌ End Call</button>
     <button (click)="leaveRoom()">🚪 Leave Room</button>
     <button (click)="toggleMic()">
-      {{ micEnabled ? '🔊 Mute' : '🔇 Unmute' }}
+      {{ micEnabled ? "🔊 Mute" : "🔇 Unmute" }}
     </button>
     <button (click)="toggleCamera()">
-      {{ cameraEnabled ? '📷 Off' : '📸 On' }}
+      {{ cameraEnabled ? "📷 Off" : "📸 On" }}
     </button>
     <button (click)="shareScreen()">🖥 Share Screen</button>
+    <button (click)="toggleChat()">
+      {{ isChatOpen ? "Close Chat" : "Open Chat" }}
+    </button>
   </div>
 
   <!-- Video grid -->
-  <div class="video-grid" *ngIf="isInRoom" [ngStyle]="{'grid-template-columns': gridTemplateColumns()}">
+  <div
+    class="video-grid"
+    *ngIf="isInRoom"
+    [ngStyle]="{ 'grid-template-columns': gridTemplateColumns() }"
+  >
     <!-- Local video -->
     <div class="video-container" *ngIf="localStream">
       <video [srcObject]="localStream" autoplay playsinline muted></video>
@@ -36,9 +45,65 @@
     </div>
 
     <!-- Remote videos -->
-    <div class="video-container" *ngFor="let stream of remoteStreams | keyvalue">
+    <div
+      class="video-container"
+      *ngFor="let stream of remoteStreams | keyvalue"
+    >
+    <div class="btn">
+      <button (click)="toggleMute(stream.key)" *ngIf="isHost">
+        {{ isParticipantMuted(stream.key) ? "Unmute" : "Mute" }}
+      </button>
+      <button (click)="removeUser(stream.key)" *ngIf="isHost">Remove</button>
+      <!-- For each participant -->
+<button *ngIf="isHost" (click)="toggleHostCamera(stream.key)">
+  {{ isParticipantCameraOff(stream.key) ? 'Turn On Camera' : 'Turn Off Camera' }}
+</button>
+
+      </div>
       <video [srcObject]="stream.value" autoplay playsinline></video>
-      <div class="video-label">Participant {{ stream.key }}</div>
+
+      <div class="video-label">
+  Participant {{ stream.key }} - {{ usernames[stream.key] || 'Unknown' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat interface -->
+  <div class="chat-sidebar" [class.open]="isChatOpen">
+    <div class="chat-header">
+      Chat
+      <button class="close-btn" (click)="toggleChat()">✖</button>
+    </div>
+
+    <div class="chat-username">
+      <label for="username">Username:</label>
+      <input
+        id="username"
+        [(ngModel)]="username"
+        placeholder="Enter your username"
+      />
+      <button (click)="registerUsername()">Register</button>
+    </div>
+
+    <div class="chat-messages">
+      <div *ngFor="let message of chatMessages" class="chat-message">
+        {{ message }}
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <input #privateMessageUser placeholder="Recipient username" />
+      <input #privateMessageContent placeholder="Message" />
+      <button
+        (click)="
+          sendPrivateMessage(
+            privateMessageUser.value,
+            privateMessageContent.value
+          )
+        "
+      >
+        Send
+      </button>
     </div>
   </div>
 </div>

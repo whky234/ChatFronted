@@ -58,6 +58,21 @@ export class GroupserService {
     return this.http.delete(`${this.apiUrl}/leavegroup/${groupId}`, { headers });
   }
 
+
+  // Remove a member from a group (admin only)
+removeMemberFromGroup(groupId: string, memberId: string): Observable<any> {
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${this.authser.getToken()}`,
+    'Content-Type': 'application/json'
+  });
+
+  return this.http.request('delete', `${this.apiUrl}/remove-member`, {
+    headers,
+    body: { groupId, memberId }
+  });
+}
+
+
    // ✅ Get Group Details by Group ID
   getGroupDetails(groupId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/group/${groupId}`);

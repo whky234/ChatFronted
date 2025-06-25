@@ -185,6 +185,12 @@ export class UserlistComponent implements OnInit {
       this.loadUserGroups(); // Refresh groups list
     });
 
+    this.socket.on("group-added", (group) => {
+      // Append group to the user’s group list in UI
+      console.log("New group added:", group);
+      this.groups.push(group); // or refetch group list
+    });
+
     // Retrieve stored user ID from localStorage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -499,37 +505,54 @@ export class UserlistComponent implements OnInit {
     );
   }
 
-  openAddMembersDialog() {
-    this.fetchchat();
-    setTimeout(() => {
-      console.log('Available users:', this.availableUsers);
+ openAddMembersDialog() {
+  this.fetchchat();
 
-      const dialogRef = this.Dialog.open(AddmembersComponent, {
-        width: '400px',
-        data: { groupId: this.groups, users: this.availableUsers },
-      });
+  setTimeout(() => {
+    console.log('Available users:', this.availableUsers);
 
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result && result.length > 0) {
-          console.log('Members added:', result);
+    const dialogRef = this.Dialog.open(AddmembersComponent, {
+      width: '400px',
+      data: { groupId: this.groups, users: this.availableUsers },
+    });
 
-          this.groupService.addMembers(this.groups, result).subscribe({
-            next: (res) => {
-              console.log('Members successfully added:', res);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.length > 0) {
+        console.log('Members added:', result);
 
-              // ✅ Emit socket event after successfully adding members
-              this.socket.emit('group:addMembers', {
-                groupId: this.groups,
-                newMembers: result,
-                adminId: this.currentuser._id,
-              });
-            },
-            error: (err) => console.error('Error adding members:', err),
-          });
-        }
-      });
-    }, 500);
-  }
+        this.groupService.addMembers(this.groups, result).subscribe({
+          next: (res) => {
+            console.log('Members successfully added:', res);
+
+            this.snackBar.open(res.message, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-success'],
+            });
+
+            this.socket.emit('group:addMembers', {
+              groupId: this.groups,
+              newMembers: result,
+              adminId: this.currentuser,
+            });
+          },
+          error: (err) => {
+            console.error('Error adding members:', err);
+
+            this.snackBar.open(err.error.message, 'Close', {
+              duration: 3000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-error'],
+            });
+          },
+        });
+      }
+    });
+  }, 500);
+}
+
 
   memberLeft(groupId: string, userId: string): void {
     this.socket.emit('group:member:left', { groupId, userId });
